@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 validator: (text) {
                   if (text == null || text
                       .trim()
-                      .isNotEmpty) {
+                      .isEmpty) {
                     return "Empty Email are not Allowed";
                   }
                   final bool emailValid =
@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Icon(Icons.arrow_forward),
                 ],
               )),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, RegisterScreen.routeName);
@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
-    // if(!formKey.currentState!.validate()) return;
+    if(!formKey.currentState!.validate()) return;
     try {
       DialogUtils.showLoading(context);
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
           password: passwordController.text
       );
       DialogUtils.hideLoading(context);
-      Navigator.pushNamed(context, HomeScreen.routeName);
+      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
     } on FirebaseAuthException catch (e) {
       DialogUtils.hideLoading(context);
       if (e.code == 'user-not-found') {
