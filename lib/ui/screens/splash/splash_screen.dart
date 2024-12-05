@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Colors.green,
       body: Center(
         child: Image.asset(
-          "assets/logo.png",
+          "assets/img/logo.png",
           fit: BoxFit.fill,
           width: 250,
           height: 250,
