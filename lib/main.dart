@@ -1,4 +1,5 @@
 import 'package:agri_hope/ui/screens/auth/login/login_screen.dart';
+import 'package:agri_hope/ui/screens/auth/otp/otp_verification.dart';
 import 'package:agri_hope/ui/screens/auth/register/register_screen.dart';
 import 'package:agri_hope/ui/screens/home_screen.dart';
 import 'package:agri_hope/ui/screens/splash/splash_screen.dart';
@@ -25,8 +26,9 @@ class MyApp extends StatelessWidget {
         RegisterScreen.routeName: (_) => const RegisterScreen(),
         HomeScreen.routeName: (_) => const HomeScreen(),
         SplashScreen.routeName: (_) => const SplashScreen(),
+        OTPVerification.routeName:(_)=> const OTPVerification(),
       },
-      initialRoute: HomeScreen.routeName,
+      initialRoute: SplashScreen.routeName,
       debugShowCheckedModeBanner: false,
     );
   }

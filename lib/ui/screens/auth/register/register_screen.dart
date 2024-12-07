@@ -1,7 +1,10 @@
-import 'package:agri_hope/ui/utils/dialog_utils.dart';
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../../utils/dialog_utils.dart';
 import '../login/login_screen.dart';
+import '../otp/otp_verification.dart';
+import '../services/email_services.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String routeName = "register";
@@ -14,13 +17,14 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController userNameController = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final TextEditingController rePasswordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final EmailService emailService = EmailService(
+    username: 'agriHope422@gmail.com',
+    password: 'knjy lqvs hcjm pgrl',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +45,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           height: 500,
           width: 500,
           alignment: Alignment.center,
-          color: Colors.white,
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(30)),
           child: Form(
             key: formKey,
             child: Padding(
@@ -53,9 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     "Sign Up a New Account",
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const Spacer(
-                    flex: 2,
-                  ),
+                  const Spacer(flex: 2),
                   TextFormField(
                     controller: userNameController,
                     decoration: const InputDecoration(labelText: "User Name"),
@@ -71,7 +74,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: const InputDecoration(labelText: "Email"),
                     validator: (text) {
                       if (text == null || text.trim().isEmpty) {
-                        return "Empty Email are not Allowed";
+                        return "Empty Emails are not Allowed";
                       }
                       final bool emailValid = RegExp(
                               r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
@@ -87,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: const InputDecoration(labelText: "Password"),
                     validator: (text) {
                       if (text == null || text.length < 6) {
-                        return "Please Enter Valid Password";
+                        return "Please Enter a Valid Password";
                       }
                       return null;
                     },
@@ -97,21 +100,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: const InputDecoration(labelText: "Re-Password"),
                     validator: (text) {
                       if (text == null || text.length < 6) {
-                        return "Please Enter Valid Password";
+                        return "Please Enter a Valid Password";
                       }
                       if (text != passwordController.text) {
-                        return "Passwords does not Match";
+                        return "Passwords do not Match";
                       }
                       return null;
                     },
                   ),
-                  const Spacer(
-                    flex: 4,
-                  ),
+                  const Spacer(flex: 4),
                   ElevatedButton(
-                      onPressed: () {
-                        registerAccount();
-                      },
+                      onPressed: registerAccount,
                       child: const Row(
                         children: [
                           Text("Create an Account"),
@@ -119,9 +118,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Icon(Icons.arrow_forward),
                         ],
                       )),
-                  const Spacer(
-                    flex: 6,
-                  ),
+                  const Spacer(flex: 6),
                 ],
               ),
             ),
@@ -133,12 +130,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void registerAccount() async {
     if (!formKey.currentState!.validate()) return;
+    DialogUtils.showLoading(context);
     try {
-      DialogUtils.showLoading(context);
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
+        email: emailController.text,
+        password: passwordController.text,
+      );
       DialogUtils.hideLoading(context);
-      Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+      final String otp = generateOTP();
+      await emailService.sendOtpEmail(
+        recipientEmail: emailController.text,
+        otp: otp,
+      );
+      Navigator.pushReplacementNamed(
+        context,
+        OTPVerification.routeName,
+        arguments: {
+          'email': emailController.text,
+          'generatedOtp': otp,
+        },
+      );
     } on FirebaseAuthException catch (e) {
       DialogUtils.hideLoading(context);
       if (e.code == 'weak-password') {
@@ -148,8 +159,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
             context, 'The account already exists for that email.');
       } else {
         DialogUtils.showError(
-            context, 'Something Went Wrong,Please Try Again Later');
+            context, 'Something went wrong. Please try again later.');
       }
+    } catch (e) {
+      DialogUtils.hideLoading(context);
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            )
+          ],
+        ),
+      );
     }
+  }
+
+  String generateOTP({int length = 6}) {
+    final Random random = Random();
+    String otp = '';
+    for (int i = 0; i < length; i++) {
+      otp += random.nextInt(10).toString();
+    }
+    return otp;
   }
 }

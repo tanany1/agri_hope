@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
           height: 500,
           width: 500,
           alignment: Alignment.center,
-          color: Colors.white,
+          decoration: BoxDecoration(color: Colors.white , borderRadius: BorderRadius.circular(30)),
           child: Form(
             key: formKey,
             child: Padding(
