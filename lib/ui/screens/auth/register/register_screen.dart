@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/dialog_utils.dart';
-import '../login/login_screen.dart';
 import '../otp/otp_verification.dart';
 import '../services/email_services.dart';
 
