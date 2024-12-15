@@ -2,6 +2,9 @@ import 'package:agri_hope/ui/widgets/model_card_widget.dart';
 import 'package:agri_hope/ui/widgets/side_menu_widget.dart';
 import 'package:agri_hope/ui/widgets/weather_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../modal/user_data.dart';
 
 class HomeScreen extends StatelessWidget {
   static const String routeName = "Home";
@@ -10,6 +13,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final username = Provider.of<UserData>(context).username;
     return Scaffold(
       drawer: const SideMenuWidget(),
       backgroundColor: Colors.grey,

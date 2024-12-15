@@ -6,10 +6,19 @@ import 'package:agri_hope/ui/screens/splash/splash_screen.dart';
 import 'package:agri_hope/ui/widgets/5days_forecast_widget.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
+import 'modal/user_data.dart';
 
 void main() async {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserData()),
+      ],
+      child: const MyApp(),
+    ),
+  );
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -27,12 +36,13 @@ class MyApp extends StatelessWidget {
         RegisterScreen.routeName: (_) => const RegisterScreen(),
         HomeScreen.routeName: (_) => const HomeScreen(),
         SplashScreen.routeName: (_) => const SplashScreen(),
-        OTPVerification.routeName:(_)=> const OTPVerification(),
-        FiveDayForecastScreen.routeName:(_)=> FiveDayForecastScreen(apiKey: 'cb17b0b03b1d59110c09ffa366d71224',)
+        OTPVerification.routeName: (_) => const OTPVerification(),
+        FiveDayForecastScreen.routeName: (_) => FiveDayForecastScreen(
+              apiKey: 'cb17b0b03b1d59110c09ffa366d71224',
+            )
       },
       initialRoute: SplashScreen.routeName,
       debugShowCheckedModeBanner: false,
     );
   }
-
 }

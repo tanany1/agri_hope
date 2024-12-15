@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../modal/user_data.dart';
 
 class SideMenuWidget extends StatelessWidget {
   const SideMenuWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final username = Provider.of<UserData>(context).username;
     return Drawer(
       width: 500,
       child: Padding(
@@ -12,14 +16,14 @@ class SideMenuWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 60,),
+            SizedBox(height: 60),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: (){},
                 child: Row(
                   children: [
-                    Text("Profile"),
+                    Text("Hi $username"),
                     Spacer(),
                     Image.asset("assets/img/profile.png", width: 50,height: 50,),
                   ],

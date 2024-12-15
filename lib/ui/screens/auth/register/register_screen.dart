@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../modal/user_data.dart';
 import '../../../utils/dialog_utils.dart';
 import '../otp/otp_verification.dart';
 import '../services/email_services.dart';
@@ -85,6 +87,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   TextFormField(
+                    obscureText: true,
+                    obscuringCharacter: "*",
                     controller: passwordController,
                     decoration: const InputDecoration(labelText: "Password"),
                     validator: (text) {
@@ -95,6 +99,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   TextFormField(
+                    obscureText: true,
+                    obscuringCharacter: "*",
                     controller: rePasswordController,
                     decoration: const InputDecoration(labelText: "Re-Password"),
                     validator: (text) {
@@ -136,6 +142,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: passwordController.text,
       );
       DialogUtils.hideLoading(context);
+      final String username = userNameController.text;
+      Provider.of<UserData>(context, listen: false).setUsername(username);
       final String otp = generateOTP();
       await emailService.sendOtpEmail(
         recipientEmail: emailController.text,
