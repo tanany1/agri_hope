@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../modal/user_data.dart';
 import '../../../utils/dialog_utils.dart';
 import '../otp/otp_verification.dart';
@@ -143,6 +144,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       DialogUtils.hideLoading(context);
       final String username = userNameController.text;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username', username);
       Provider.of<UserData>(context, listen: false).setUsername(username);
       final String otp = generateOTP();
       await emailService.sendOtpEmail(

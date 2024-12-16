@@ -11,12 +11,12 @@ import 'firebase_options.dart';
 import 'modal/user_data.dart';
 
 void main() async {
+  final userProvider = UserData();
+  await userProvider.loadUsernameFromPreferences();
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UserData()),
-      ],
-      child: const MyApp(),
+    ChangeNotifierProvider(
+      create: (_) => userProvider,
+      child: MyApp(),
     ),
   );
   WidgetsFlutterBinding.ensureInitialized();

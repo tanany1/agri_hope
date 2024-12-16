@@ -19,15 +19,12 @@ class SideMenuWidget extends StatelessWidget {
             SizedBox(height: 60),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: (){},
-                child: Row(
-                  children: [
-                    Text("Hi $username"),
-                    Spacer(),
-                    Image.asset("assets/img/profile.png", width: 50,height: 50,),
-                  ],
-                ),
+              child: Row(
+                children: [
+                  Text("Hi $username"),
+                  Spacer(),
+                  Image.asset("assets/img/profile.png", width: 50,height: 50,),
+                ],
               ),
             ),
             Container(color: Colors.black,height: 2,),

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../modal/user_data.dart';
 import '../../../utils/dialog_utils.dart';
 import '../../home_screen.dart';
 import '../register/register_screen.dart';
@@ -15,11 +17,24 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final TextEditingController emailController = TextEditingController();
 
   final TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  void initState() {
+    super.initState();
+    checkLoginState();
+  }
+
+  Future<void> checkLoginState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,89 +55,101 @@ class _LoginScreenState extends State<LoginScreen> {
           height: 500,
           width: 500,
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: Colors.white , borderRadius: BorderRadius.circular(30)),
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(30)),
           child: Form(
             key: formKey,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
-                  children: [
-                  const Spacer(),
-              const Text("Log in With Your Account", style: TextStyle(
-                  fontSize: 24, fontWeight: FontWeight.bold
-              ),),
-              const Spacer(flex: 2,),
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(
-                    labelText: "Email"
-                ),
-                validator: (text) {
-                  if (text == null || text
-                      .trim()
-                      .isEmpty) {
-                    return "Empty Email are not Allowed";
-                  }
-                  final bool emailValid =
-                  RegExp(
-                      r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                      .hasMatch(text);
-                  if (!emailValid) {
-                    return "This Email is not Allowed";
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                obscureText: true,
-                obscuringCharacter: "*",
-                controller: passwordController,
-                decoration: const InputDecoration(
-                    labelText: "Password"
-                ),
-                validator: (text) {
-                  if (text == null || text.length < 6) {
-                    return "Please Enter Valid Password";
-                  }
-                  return null;
-                },
-              ),
-              const Spacer(flex: 4,),
-              ElevatedButton(onPressed: () {
-                login();
-              }, child: const Row(
                 children: [
-                  Text("Log In"),
-                  Spacer(),
-                  Icon(Icons.arrow_forward),
+                  const Spacer(),
+                  const Text(
+                    "Log in With Your Account",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(
+                    flex: 2,
+                  ),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: const InputDecoration(labelText: "Email"),
+                    validator: (text) {
+                      if (text == null || text.trim().isEmpty) {
+                        return "Empty Email are not Allowed";
+                      }
+                      final bool emailValid = RegExp(
+                              r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                          .hasMatch(text);
+                      if (!emailValid) {
+                        return "This Email is not Allowed";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    obscureText: true,
+                    obscuringCharacter: "*",
+                    controller: passwordController,
+                    decoration: const InputDecoration(labelText: "Password"),
+                    validator: (text) {
+                      if (text == null || text.length < 6) {
+                        return "Please Enter Valid Password";
+                      }
+                      return null;
+                    },
+                  ),
+                  const Spacer(
+                    flex: 4,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        login();
+                      },
+                      child: const Row(
+                        children: [
+                          Text("Log In"),
+                          Spacer(),
+                          Icon(Icons.arrow_forward),
+                        ],
+                      )),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, RegisterScreen.routeName);
+                    },
+                    child: const Text(
+                      "Don't have an Account? Sign Up Now",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(decoration: TextDecoration.underline),
+                    ),
+                  ),
+                  const Spacer(
+                    flex: 6,
+                  ),
                 ],
-              )),
-              const SizedBox(height: 10,),
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, RegisterScreen.routeName);
-                },
-                child: const Text("Don't have an Account? Sign Up Now",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(decoration: TextDecoration.underline),),
               ),
-              const Spacer(flex: 6,),
-            ],
+            ),
           ),
         ),
-      ),),)
-    ,
+      ),
     );
   }
 
   Future<void> login() async {
-    if(!formKey.currentState!.validate()) return;
+    if (!formKey.currentState!.validate()) return;
     try {
       DialogUtils.showLoading(context);
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text
-      );
+          email: emailController.text, password: passwordController.text);
+      final prefs = await SharedPreferences.getInstance();
+      final username = prefs.getString('username') ?? 'Guest';
+      Provider.of<UserData>(context, listen: false).setUsername(username);
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('username', username);
+      Provider.of<UserData>(context, listen: false).setUsername(username);
       DialogUtils.hideLoading(context);
       Navigator.pushReplacementNamed(context, HomeScreen.routeName);
     } on FirebaseAuthException catch (e) {
