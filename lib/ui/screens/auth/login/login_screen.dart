@@ -30,7 +30,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> checkLoginState() async {
     final prefs = await SharedPreferences.getInstance();
     final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
     if (isLoggedIn) {
       Navigator.pushReplacementNamed(context, HomeScreen.routeName);
     }
