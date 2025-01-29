@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
     final username = Provider.of<UserData>(context).username;
     return Scaffold(
       drawer: const SideMenuWidget(),
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "Agri Hope",
