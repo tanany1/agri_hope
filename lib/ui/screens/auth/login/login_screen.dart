@@ -125,6 +125,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(decoration: TextDecoration.underline),
                     ),
                   ),
+                  SizedBox(height: 20,),
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, HomeScreen.routeName);
+                    },
+                    child: const Text(
+                      "Counting as A Guest",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(decoration: TextDecoration.underline),
+                    ),
+                  ),
                   const Spacer(
                     flex: 6,
                   ),

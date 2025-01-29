@@ -1,9 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class CropRecommendationModelScreen extends StatelessWidget {
+class CropRecommendationModelScreen extends StatefulWidget {
   static const String routeName = "crop Recommendation Model";
 
   const CropRecommendationModelScreen({super.key});
+
+  @override
+  _CropRecommendationModelScreenState createState() =>
+      _CropRecommendationModelScreenState();
+}
+
+class _CropRecommendationModelScreenState
+    extends State<CropRecommendationModelScreen> {
+  final TextEditingController nController = TextEditingController();
+  final TextEditingController pController = TextEditingController();
+  final TextEditingController kController = TextEditingController();
+  final TextEditingController tempController = TextEditingController();
+  final TextEditingController humidityController = TextEditingController();
+  final TextEditingController phController = TextEditingController();
+  final TextEditingController rainfallController = TextEditingController();
+
+  Future<void> predictCrop() async {
+    final Uri apiUrl = Uri.parse("http://127.0.0.1:5000/croprecommendation");
+
+    final response = await http.post(
+      apiUrl,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "N": double.parse(nController.text),
+        "P": double.parse(pController.text),
+        "K": double.parse(kController.text),
+        "temperature": double.parse(tempController.text),
+        "humidity": double.parse(humidityController.text),
+        "ph": double.parse(phController.text),
+        "rainfall": double.parse(rainfallController.text),
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      showResultDialog(result["message"]);
+    } else {
+      showResultDialog("Error: Unable to fetch prediction");
+    }
+  }
+
+  void showResultDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Crop Recommendation"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,160 +90,13 @@ class CropRecommendationModelScreen extends StatelessWidget {
               Expanded(
                 child: GridView(
                   children: [
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "N",
-                        labelStyle: TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      ),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "P",
-                        labelStyle: TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      ),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "K",
-                        labelStyle: TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      ),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "Temperature",
-                        labelStyle: TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      ),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "Humidity",
-                        labelStyle: TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      ),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "PH",
-                        labelStyle: TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      ),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "RainfAll",
-                        labelStyle: TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      ),
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    buildTextField(nController, "N"),
+                    buildTextField(pController, "P"),
+                    buildTextField(kController, "K"),
+                    buildTextField(tempController, "Temperature"),
+                    buildTextField(humidityController, "Humidity"),
+                    buildTextField(phController, "PH"),
+                    buildTextField(rainfallController, "Rainfall"),
                   ],
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -198,7 +109,7 @@ class CropRecommendationModelScreen extends StatelessWidget {
               SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: predictCrop,
                   child: Text(
                     "Predict",
                     style: TextStyle(color: Colors.white),
@@ -211,8 +122,34 @@ class CropRecommendationModelScreen extends StatelessWidget {
             ],
           ),
         ),
-
       ),
+    );
+  }
+
+  Widget buildTextField(TextEditingController controller, String label) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.grey),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.blue, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      ),
+      keyboardType: TextInputType.number,
+      style: TextStyle(fontSize: 16),
     );
   }
 }

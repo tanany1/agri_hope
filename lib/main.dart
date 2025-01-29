@@ -1,4 +1,5 @@
 import 'package:agri_hope/ui/screens/ai_models/crop_recommendation_model_screen.dart';
+import 'package:agri_hope/ui/screens/all_models.dart';
 import 'package:agri_hope/ui/screens/auth/login/login_screen.dart';
 import 'package:agri_hope/ui/screens/auth/otp/otp_verification.dart';
 import 'package:agri_hope/ui/screens/auth/register/register_screen.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
             ),
         SettingsScreen.routeName:(_)=> SettingsScreen(),
         CropRecommendationModelScreen.routeName:(_)=> CropRecommendationModelScreen(),
+        AllModels.routeName:(_)=> AllModels(),
       },
       initialRoute: SplashScreen.routeName,
       debugShowCheckedModeBanner: false,

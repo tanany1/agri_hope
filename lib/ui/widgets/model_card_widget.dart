@@ -11,8 +11,8 @@ class ModelCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300,
-      height: 300,
+      width: 100,
+      height: 200,
       decoration: BoxDecoration(
           color: Colors.green, borderRadius: BorderRadius.circular(25)),
       child: Padding(
@@ -21,8 +21,8 @@ class ModelCardWidget extends StatelessWidget {
           children: [
             Image.asset(
               imagePath,
-              height: 180,
-              width: 180,
+              height: 150,
+              width: 150,
             ),
             Spacer(),
             Text(
