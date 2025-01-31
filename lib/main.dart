@@ -1,4 +1,5 @@
 import 'package:agri_hope/ui/screens/ai_models/crop_recommendation_model_screen.dart';
+import 'package:agri_hope/ui/screens/ai_models/soil_type_model.dart';
 import 'package:agri_hope/ui/screens/all_models.dart';
 import 'package:agri_hope/ui/screens/auth/login/login_screen.dart';
 import 'package:agri_hope/ui/screens/auth/otp/otp_verification.dart';
@@ -14,6 +15,7 @@ import 'firebase_options.dart';
 import 'modal/user_data.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final userProvider = UserData();
   await userProvider.loadUsernameFromPreferences();
   runApp(
@@ -22,7 +24,6 @@ void main() async {
       child: MyApp(),
     ),
   );
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         SettingsScreen.routeName:(_)=> SettingsScreen(),
         CropRecommendationModelScreen.routeName:(_)=> CropRecommendationModelScreen(),
         AllModels.routeName:(_)=> AllModels(),
+        SoilTypeModelScreen.routeName:(_)=>SoilTypeModelScreen(),
       },
       initialRoute: SplashScreen.routeName,
       debugShowCheckedModeBanner: false,

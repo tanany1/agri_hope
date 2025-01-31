@@ -1,3 +1,4 @@
+import 'package:agri_hope/ui/utils/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -39,17 +40,31 @@ class _CropRecommendationModelScreenState
         content: const Text("Choose how to input data."),
         actions: [
           TextButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary2,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text("Manual"),
+            child: const Text("Manual" , style:  TextStyle(color: Colors.white),),
           ),
           TextButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary2,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
             onPressed: () {
               Navigator.pop(context);
               startAutomaticMode();
             },
-            child: const Text("Automatic"),
+            child: const Text("Automatic" , style:  TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -121,10 +136,15 @@ class _CropRecommendationModelScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        surfaceTintColor: AppColors.primary1,
         title: const Text("Crop Recommendation"),
         content: Text(message),
         actions: [
           TextButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary2),
+              foregroundColor: WidgetStateProperty.all<Color>(AppColors.white),
+            ),
             onPressed: () => Navigator.pop(context),
             child: const Text("OK"),
           ),
@@ -136,34 +156,26 @@ class _CropRecommendationModelScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
+        title: const Text(
+          "Agri Hope",
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 28, color: AppColors.white),
+        ),
+        elevation: 20,
+        centerTitle: true,
+        backgroundColor: AppColors.primary3,
+      ),
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.green,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                const Spacer(),
-                const Text(
-                  "Agri Hope",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const Spacer(),
-              ],
-            ),
-          ),
-          Container(
             margin: EdgeInsets.all(20),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(25) , color: Colors.grey.shade300,),
+            padding: const EdgeInsets.all(30),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(25) , color: AppColors.primary2,),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -171,10 +183,10 @@ class _CropRecommendationModelScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Model 1", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    Text("Crop Recommendation", style: TextStyle(color: Colors.green)),
+                    Text("Crop Recommendation", style: TextStyle(color: AppColors.primary4 , fontWeight: FontWeight.bold)),
                   ],
                 ),
-                const Icon(Icons.article_outlined, size: 40, color: Colors.grey),
+                const Icon(Icons.article_outlined, size: 40, color: AppColors.white),
               ],
             ),
           ),
@@ -203,7 +215,7 @@ class _CropRecommendationModelScreenState
             child: ElevatedButton(
               onPressed: predictCrop,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.primary2,
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -227,7 +239,7 @@ class _CropRecommendationModelScreenState
           controller: controller,
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.grey.shade200,
+            fillColor: AppColors.primary1,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,

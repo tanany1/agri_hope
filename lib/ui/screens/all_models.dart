@@ -1,6 +1,8 @@
+import 'package:agri_hope/ui/screens/ai_models/soil_type_model.dart';
 import 'package:agri_hope/ui/widgets/model_card_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/app_color.dart';
 import 'ai_models/crop_recommendation_model_screen.dart';
 
 
@@ -14,42 +16,41 @@ class AllModels extends StatelessWidget {
       {
         "imagePath": "assets/img/crop_icon.png",
         "modelName": "Crop Recommendation",
-        "modelNumber": "Model 1",
         "routeName": CropRecommendationModelScreen.routeName,
-      },
-      {
-        "imagePath": "assets/img/soil_fertile.png",
-        "modelName": "Soil Fertile",
-        "modelNumber": "Model 2 (Coming Soon)",
-        // "routeName": WeatherPredictionScreen.routeName,
-      },
-      {
-        "imagePath": "assets/img/plant disease.png",
-        "modelName": "Plant Disease Detection",
-        "modelNumber": "Model 3 (Coming Soon)",
-        // "routeName": DiseaseDetectionScreen.routeName,
       },
       {
         "imagePath": "assets/img/soil type.png",
         "modelName": "Soil Type Analysis",
-        "modelNumber": "Model 4 (Coming Soon)",
-        // "routeName": SoilAnalysisScreen.routeName,
+        "routeName": SoilTypeModelScreen.routeName,
+      },
+      {
+        "imagePath": "assets/img/plant disease.png",
+        "modelName": "Plant Disease Detection (Coming Soon)",
+        // "routeName": DiseaseDetectionScreen.routeName,
+      },
+      {
+        "imagePath": "assets/img/soil_fertile.png",
+        "modelName": "Soil Fertile (Coming Soon)",
+        // "routeName": WeatherPredictionScreen.routeName,
       },
     ];
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: AppColors.white,
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
         title: const Text(
           "Agri Hope",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
-            color: Colors.white,
+            color: AppColors.white,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.primary3,
         elevation: 4,
       ),
       body: Padding(
@@ -71,7 +72,6 @@ class AllModels extends StatelessWidget {
               child: ModelCardWidget(
                 imagePath: model["imagePath"]!,
                 modelName: model["modelName"]!,
-                modelNumber: model["modelNumber"]!,
               ),
             );
           },

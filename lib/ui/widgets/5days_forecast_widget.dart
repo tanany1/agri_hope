@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
 
+import '../utils/app_color.dart';
+
 class FiveDayForecastScreen extends StatefulWidget {
   final String apiKey;
   static const String routeName="5day forecast";
@@ -49,7 +51,12 @@ class _FiveDayForecastScreenState extends State<FiveDayForecastScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('5-Day Forecast'),
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
+        backgroundColor: AppColors.primary3,
+        centerTitle: true,
+        title: const Text('5-Day Forecast' , style:  TextStyle(color: AppColors.white),),
       ),
       body: groupedForecast == null
           ? const Center(child: CircularProgressIndicator())
@@ -65,13 +72,14 @@ class _FiveDayForecastScreenState extends State<FiveDayForecastScreen> {
             return SizedBox(
               width: 250,
               child: Card(
+                color: AppColors.primary1,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
                 elevation: 4,
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(25.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

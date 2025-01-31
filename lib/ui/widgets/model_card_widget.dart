@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../utils/app_color.dart';
+
 class ModelCardWidget extends StatelessWidget {
   ModelCardWidget(
-      {super.key, required this.modelNumber, required this.modelName, required this.imagePath});
+      {super.key, required this.modelName, required this.imagePath});
 
   String imagePath;
-  String modelNumber;
   String modelName;
 
   @override
@@ -14,7 +15,7 @@ class ModelCardWidget extends StatelessWidget {
       width: 100,
       height: 200,
       decoration: BoxDecoration(
-          color: Colors.green, borderRadius: BorderRadius.circular(25)),
+          color: AppColors.primary5, borderRadius: BorderRadius.circular(25)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -24,17 +25,10 @@ class ModelCardWidget extends StatelessWidget {
               height: 150,
               width: 150,
             ),
-            Spacer(),
-            Text(
-              modelNumber,
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 8,
-            ),
+            SizedBox(height: 50,),
             Text(
               modelName,
-              style: TextStyle(fontSize: 24),
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold , color: AppColors.primary4),
             )
           ],
         ),

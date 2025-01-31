@@ -1,3 +1,4 @@
+import 'package:agri_hope/ui/utils/app_color.dart';
 import 'package:agri_hope/ui/widgets/5days_forecast_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
@@ -52,14 +53,14 @@ class _WeatherWidgetState extends State<WeatherWidget> {
         Navigator.pushNamed(context, FiveDayForecastScreen.routeName);
       },
       child: Container(
-        width: double.infinity,
+        width: 1400,
         height: 200,
         decoration: BoxDecoration(
-          color: Colors.blueAccent,
+          color: AppColors.primary5,
           borderRadius: BorderRadius.circular(25),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(40),
           child: currentWeather == null
               ? Center(child: CircularProgressIndicator())
               : Row(
@@ -88,8 +89,8 @@ class _WeatherWidgetState extends State<WeatherWidget> {
                     Spacer(),
                     Image.asset(
                       "assets/img/weather.png",
-                      width: 50,
-                      height: 50,
+                      width: 100,
+                      height: 100,
                     ),
                   ],
                 ),

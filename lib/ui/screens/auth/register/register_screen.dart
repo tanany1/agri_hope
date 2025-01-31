@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../modal/user_data.dart';
+import '../../../utils/app_color.dart';
 import '../../../utils/dialog_utils.dart';
 import '../otp/otp_verification.dart';
 import '../services/email_services.dart';
@@ -31,8 +32,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
         title: const Text(
           "Agri Hope",
           style: TextStyle(
@@ -40,7 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         elevation: 20,
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.primary3,
       ),
       body: Center(
         child: Container(
@@ -48,7 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           width: 500,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(30)),
+              color: AppColors.primary1, borderRadius: BorderRadius.circular(30)),
           child: Form(
             key: formKey,
             child: Padding(
@@ -62,6 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const Spacer(flex: 2),
                   TextFormField(
+                    cursorColor: AppColors.primary5,
                     controller: userNameController,
                     decoration: const InputDecoration(labelText: "User Name"),
                     validator: (text) {
@@ -72,6 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   TextFormField(
+                    cursorColor: AppColors.primary5,
                     controller: emailController,
                     decoration: const InputDecoration(labelText: "Email"),
                     validator: (text) {
@@ -88,6 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   TextFormField(
+                    cursorColor: AppColors.primary5,
                     obscureText: true,
                     obscuringCharacter: "*",
                     controller: passwordController,
@@ -116,12 +123,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const Spacer(flex: 4),
                   ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary2,
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
                       onPressed: registerAccount,
                       child: const Row(
                         children: [
-                          Text("Create an Account"),
+                          Text("Create an Account" , style: TextStyle(color: Colors.white),),
                           Spacer(),
-                          Icon(Icons.arrow_forward),
+                          Icon(Icons.arrow_forward , color: Colors.white,),
                         ],
                       )),
                   const Spacer(flex: 6),

@@ -1,12 +1,11 @@
-import 'package:agri_hope/ui/screens/ai_models/crop_recommendation_model_screen.dart';
 import 'package:agri_hope/ui/screens/all_models.dart';
-import 'package:agri_hope/ui/widgets/model_card_widget.dart';
 import 'package:agri_hope/ui/widgets/side_menu_widget.dart';
 import 'package:agri_hope/ui/widgets/weather_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../modal/user_data.dart';
+import '../utils/app_color.dart';
+import '../widgets/chat_bot_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   static const String routeName = "Home";
@@ -16,148 +15,164 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final username = Provider.of<UserData>(context).username;
+
     return Scaffold(
       drawer: const SideMenuWidget(),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
         title: const Text(
           "Agri Hope",
           style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white),
+              fontWeight: FontWeight.bold, fontSize: 28, color: AppColors.white),
         ),
         elevation: 20,
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.primary3,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const WeatherWidget(),
-            const SizedBox(
-              height: 50,
-            ),
-            Expanded(
-              child: Row(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: Column(
                 children: [
-                  Column(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, AllModels.routeName);
-                        },
-                        child: Center(
+                  const WeatherWidget(),
+                  const SizedBox(height: 50),
+                    Container(
+                      width: 1400,
+                      height: 400,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, AllModels.routeName);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary5,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/img/Ai Models.png",
+                            height: 250,
+                            width: 250,
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            "AI Models",
+                            style: TextStyle(
+                              color: AppColors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 1,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.green,
+                              color: AppColors.primary1,
                               borderRadius: BorderRadius.circular(50),
                             ),
-                            height: MediaQuery.of(context).size.height * 0.5,
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Column(
+                            width: 600,
+                            margin: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(20.0),
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SizedBox(
-                                  height: 50,
+                                Text(
+                                  "Latest Used Model",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary4,
+                                  ),
                                 ),
-                                Image.asset(
-                                  "assets/img/Ai Models (2).png",
-                                  height: 200,
-                                  width: 200,
+                                SizedBox(height: 10),
+                                Text(
+                                  "Crop Recommendation",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary2,
+                                  ),
                                 ),
-                                SizedBox(
-                                  height: 50,
-                                ),
-                                Text("AI Models",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    width: 50,
-                  ),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
+                        const SizedBox(height: 10),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.green,
+                              color: AppColors.primary1,
                               borderRadius: BorderRadius.circular(50),
                             ),
-                            height: MediaQuery.of(context).size.height * 0.25,
-                            width: MediaQuery.of(context).size.width * 0.42,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "Latest Used Model",
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(
-                                    height: 30,
-                                  ),
-                                  Text("Crop Recommendation" , style: TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w400 , color: Colors.white),),
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(
-                        height: 25,
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            height: MediaQuery.of(context).size.height * 0.25,
-                            width: MediaQuery.of(context).size.width * 0.42,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                children: [
-                                  Text(
+                            width: 600,
+                            margin: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(20.0),
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
                                   "Latest Recommended Crop",
-                                  textAlign: TextAlign.start,
                                   style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                  SizedBox(
-                                    height: 30,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color:AppColors.primary4,
                                   ),
-                                  Text("Rice" ,style: TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w400 , color: Colors.white),),
-                                ],
-                              ),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  "Rice",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary2,
+                                  ),
+                                ),
+                              ],
                             ),
-                          )
-                        ],
-                      )
-                    ],
-                  )
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
-            )
-          ],
-        ),
+            ),
+          ),
+          ChatBotIcon(), // Add the ChatBotIcon widget
+        ],
       ),
     );
   }

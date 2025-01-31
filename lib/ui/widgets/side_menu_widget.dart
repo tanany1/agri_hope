@@ -2,9 +2,9 @@ import 'package:agri_hope/ui/screens/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../modal/user_data.dart';
 import '../screens/auth/login/login_screen.dart';
+import '../utils/app_color.dart';
 
 class SideMenuWidget extends StatelessWidget {
   const SideMenuWidget({super.key});
@@ -13,6 +13,7 @@ class SideMenuWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final username = Provider.of<UserData>(context).username;
     return Drawer(
+      backgroundColor: AppColors.primary1,
       width: 500,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -24,7 +25,7 @@ class SideMenuWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text("Hi $username"),
+                  Text("Hi $username" , style: TextStyle(color: AppColors.primary4, fontWeight: FontWeight.bold)),
                   Spacer(),
                   Image.asset(
                     "assets/img/profile.png",
@@ -35,8 +36,8 @@ class SideMenuWidget extends StatelessWidget {
               ),
             ),
             Container(
-              color: Colors.black,
-              height: 2,
+              color: AppColors.primary5,
+              height: 3,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -44,7 +45,7 @@ class SideMenuWidget extends StatelessWidget {
                 onTap: () {},
                 child: Row(
                   children: [
-                    Text("History Log"),
+                    Text("History Log" , style: TextStyle(color: AppColors.primary4, fontWeight: FontWeight.bold),),
                     Spacer(),
                     Image.asset(
                       "assets/img/history.png",
@@ -56,8 +57,8 @@ class SideMenuWidget extends StatelessWidget {
               ),
             ),
             Container(
-              color: Colors.black,
-              height: 2,
+              color: AppColors.primary5,
+              height: 3,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -67,7 +68,7 @@ class SideMenuWidget extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    Text("Setting"),
+                    Text("Setting" , style: TextStyle(color: AppColors.primary4, fontWeight: FontWeight.bold)),
                     Spacer(),
                     Image.asset(
                       "assets/img/setting_icon.png",
@@ -90,7 +91,7 @@ class SideMenuWidget extends StatelessWidget {
                     print("Error logging out: $e");
                   }
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
                 // Background color,
                 child: Center(
                   child: Text(

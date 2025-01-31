@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../modal/user_data.dart';
+import '../../../utils/app_color.dart';
 import '../../../utils/dialog_utils.dart';
 import '../../home_screen.dart';
 import '../register/register_screen.dart';
@@ -38,8 +39,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
         title: const Text(
           "Agri Hope",
           style: TextStyle(
@@ -47,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         elevation: 20,
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.primary3,
       ),
       body: Center(
         child: Container(
@@ -55,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
           width: 500,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(30)),
+              color: AppColors.primary1, borderRadius: BorderRadius.circular(30)),
           child: Form(
             key: formKey,
             child: Padding(
@@ -71,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     flex: 2,
                   ),
                   TextFormField(
+                    cursorColor: AppColors.primary5,
                     controller: emailController,
                     decoration: const InputDecoration(labelText: "Email"),
                     validator: (text) {
@@ -87,6 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   TextFormField(
+                    cursorColor: AppColors.primary5,
                     obscureText: true,
                     obscuringCharacter: "*",
                     controller: passwordController,
@@ -102,14 +108,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     flex: 4,
                   ),
                   ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary2,
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
                       onPressed: () {
                         login();
                       },
                       child: const Row(
                         children: [
-                          Text("Log In"),
+                          Text("Log In" , style: TextStyle(color: Colors.white),),
                           Spacer(),
-                          Icon(Icons.arrow_forward),
+                          Icon(Icons.arrow_forward , color: Colors.white,),
                         ],
                       )),
                   const SizedBox(

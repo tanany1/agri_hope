@@ -1,4 +1,5 @@
 import 'package:agri_hope/ui/screens/home_screen.dart';
+import 'package:agri_hope/ui/utils/app_color.dart';
 import 'package:flutter/material.dart';
 
 class OTPVerification extends StatefulWidget {
@@ -20,7 +21,7 @@ class _OTPVerificationState extends State<OTPVerification> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final Map<String, dynamic> args =
-    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     email = args['email'];
     generatedOtp = args['generatedOtp'];
   }
@@ -41,18 +42,27 @@ class _OTPVerificationState extends State<OTPVerification> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey,
-      appBar: AppBar(title: const Text('OTP Verification'),
+      backgroundColor: AppColors.white,
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
+        title: const Text(
+          'OTP Verification',
+          style: TextStyle(color: Colors.white),
+        ),
         elevation: 20,
         centerTitle: true,
-        backgroundColor: Colors.green,),
+        backgroundColor: AppColors.primary3,
+      ),
       body: Center(
         child: Container(
           height: 500,
           width: 500,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(30)),
+              color: AppColors.primary1,
+              borderRadius: BorderRadius.circular(30)),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -68,7 +78,17 @@ class _OTPVerificationState extends State<OTPVerification> {
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 200),
-                ElevatedButton(onPressed: verifyOtp, child: const Text('Verify')),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary2,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: verifyOtp,
+                    child: const Text('Verify' , style: TextStyle(color: Colors.white),)),
                 if (errorText.isNotEmpty)
                   Text(errorText,
                       style: TextStyle(
