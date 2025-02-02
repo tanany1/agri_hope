@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
           color: Colors.white,
         ),
         title: const Text(
-          "Agri Hope",
+          "AgriHope",
           style: TextStyle(
               fontWeight: FontWeight.bold, fontSize: 28, color: AppColors.white),
         ),

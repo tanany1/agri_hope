@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
           color: Colors.white,
         ),
         title: const Text(
-          "Agri Hope",
+          "AgriHope",
           style: TextStyle(
               fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white),
         ),
@@ -144,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.pushNamed(context, HomeScreen.routeName);
                     },
                     child: const Text(
-                      "Counting as A Guest",
+                      "Continue as A Guest",
                       textAlign: TextAlign.center,
                       style: TextStyle(decoration: TextDecoration.underline),
                     ),

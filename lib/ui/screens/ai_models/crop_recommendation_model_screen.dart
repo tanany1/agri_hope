@@ -23,7 +23,7 @@ class _CropRecommendationModelScreenState
   final TextEditingController phController = TextEditingController();
   final TextEditingController rainfallController = TextEditingController();
 
-  final List<double> predefinedData = [50, 40, 30, 25.5, 65.3, 6.5 , 200];
+  final List<double> predefinedData = [48.73, 38.42, 27.81, 23.57, 62.00121, 6.504 , 200.117];
 
   @override
   void initState() {
@@ -162,7 +162,7 @@ class _CropRecommendationModelScreenState
           color: Colors.white,
         ),
         title: const Text(
-          "Agri Hope",
+          "AgriHope",
           style: TextStyle(
               fontWeight: FontWeight.bold, fontSize: 28, color: AppColors.white),
         ),

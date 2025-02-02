@@ -38,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           color: Colors.white,
         ),
         title: const Text(
-          "Agri Hope",
+          "AgriHope",
           style: TextStyle(
               fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white),
         ),
