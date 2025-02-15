@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import '../utils/app_color.dart';
 import 'ai_models/crop_recommendation_model_screen.dart';
 
-
 class AllModels extends StatelessWidget {
   static const String routeName = "All Models";
+
   const AllModels({super.key});
 
   @override
@@ -23,16 +23,16 @@ class AllModels extends StatelessWidget {
         "modelName": "Soil Type Analysis",
         "routeName": SoilTypeModelScreen.routeName,
       },
-      {
-        "imagePath": "assets/img/plant disease.png",
-        "modelName": "Plant Disease Detection (Coming Soon)",
-        // "routeName": DiseaseDetectionScreen.routeName,
-      },
-      {
-        "imagePath": "assets/img/soil_fertile.png",
-        "modelName": "Soil Fertile (Coming Soon)",
-        // "routeName": WeatherPredictionScreen.routeName,
-      },
+      // {
+      //   "imagePath": "assets/img/plant disease.png",
+      //   "modelName": "Plant Disease Detection (Coming Soon)",
+      //   // "routeName": DiseaseDetectionScreen.routeName,
+      // },
+      // {
+      //   "imagePath": "assets/img/soil_fertile.png",
+      //   "modelName": "Soil Fertile (Coming Soon)",
+      //   // "routeName": WeatherPredictionScreen.routeName,
+      // },
     ];
 
     return Scaffold(
@@ -54,27 +54,33 @@ class AllModels extends StatelessWidget {
         elevation: 4,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: GridView.builder(
-          itemCount: models.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 25,
-            crossAxisSpacing: 25,
-            childAspectRatio: 2.2,
-          ),
-          itemBuilder: (context, index) {
-            final model = models[index];
-            return InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, model["routeName"]!);
-              },
-              child: ModelCardWidget(
-                imagePath: model["imagePath"]!,
-                modelName: model["modelName"]!,
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: SizedBox(
+            width: 700,
+            child: GridView.builder(
+              shrinkWrap: true,
+              itemCount: models.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 20,
+                crossAxisSpacing: 20,
+                childAspectRatio: 1,
               ),
-            );
-          },
+              itemBuilder: (context, index) {
+                final model = models[index];
+                return InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, model["routeName"]!);
+                  },
+                  child: ModelCardWidget(
+                    imagePath: model["imagePath"]!,
+                    modelName: model["modelName"]!,
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

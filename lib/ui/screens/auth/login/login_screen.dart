@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
           width: 500,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: AppColors.primary1, borderRadius: BorderRadius.circular(30)),
+              color: AppColors.primary1,
+              borderRadius: BorderRadius.circular(30)),
           child: Form(
             key: formKey,
             child: Padding(
@@ -110,7 +112,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary2,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -120,9 +123,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: const Row(
                         children: [
-                          Text("Log In" , style: TextStyle(color: Colors.white),),
+                          Text(
+                            "Log In",
+                            style: TextStyle(color: Colors.white),
+                          ),
                           Spacer(),
-                          Icon(Icons.arrow_forward , color: Colors.white,),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: Colors.white,
+                          ),
                         ],
                       )),
                   const SizedBox(
@@ -138,7 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(decoration: TextDecoration.underline),
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 20,
+                  ),
                   InkWell(
                     onTap: () {
                       Navigator.pushNamed(context, HomeScreen.routeName);
@@ -166,13 +177,23 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       DialogUtils.showLoading(context);
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
-      final prefs = await SharedPreferences.getInstance();
-      final username = prefs.getString('username') ?? 'Guest';
-      Provider.of<UserData>(context, listen: false).setUsername(username);
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('username', username);
-      Provider.of<UserData>(context, listen: false).setUsername(username);
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(credential.user!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        final username = userDoc.data()?['username'] ?? 'Guest';
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', username);
+        await prefs.setBool('isLoggedIn', true);
+        Provider.of<UserData>(context, listen: false).setUsername(username);
+      } else {
+        DialogUtils.showError(context, 'User data not found.');
+      }
       DialogUtils.hideLoading(context);
       Navigator.pushReplacementNamed(context, HomeScreen.routeName);
     } on FirebaseAuthException catch (e) {
@@ -180,12 +201,30 @@ class _LoginScreenState extends State<LoginScreen> {
       if (e.code == 'user-not-found') {
         DialogUtils.showError(context, 'No user found for that email.');
       } else if (e.code == 'wrong-password') {
-        DialogUtils.showError(
-            context, 'Wrong password provided for that user.');
+        DialogUtils.showError(context, 'Wrong password provided.');
       } else {
         DialogUtils.showError(
-            context, 'Something Went Wrong,Please Try Again Later');
+            context, 'Something went wrong. Try again later.');
       }
     }
+  }
+
+  Future<String?> fetchUsernameFromDatabase(String email) async {
+    try {
+      final userCollection = FirebaseFirestore.instance.collection('users');
+      final userDoc =
+          await userCollection.where('email', isEqualTo: email).get();
+
+      if (userDoc.docs.isNotEmpty) {
+        String username = userDoc.docs.first.data()['username'];
+        print('Fetched Username: $username');
+        return username;
+      } else {
+        print('No user found for this email');
+      }
+    } catch (e) {
+      print('Error fetching username: $e');
+    }
+    return null;
   }
 }

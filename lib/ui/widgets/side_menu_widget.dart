@@ -1,17 +1,35 @@
-import 'package:agri_hope/ui/screens/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../modal/user_data.dart';
+
 import '../screens/auth/login/login_screen.dart';
+import '../screens/settings/settings_screen.dart';
 import '../utils/app_color.dart';
 
-class SideMenuWidget extends StatelessWidget {
+class SideMenuWidget extends StatefulWidget {
   const SideMenuWidget({super.key});
 
   @override
+  State<SideMenuWidget> createState() => _SideMenuWidgetState();
+}
+
+class _SideMenuWidgetState extends State<SideMenuWidget> {
+  String username = "Guest";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
+
+  Future<void> _loadUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? "Guest";
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final username = Provider.of<UserData>(context).username;
     return Drawer(
       backgroundColor: AppColors.primary1,
       width: 500,
@@ -20,13 +38,16 @@ class SideMenuWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 60),
+            const SizedBox(height: 60),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text("Hi $username" , style: TextStyle(color: AppColors.primary4, fontWeight: FontWeight.bold)),
-                  Spacer(),
+                  Text("Hi $username",
+                      style: TextStyle(
+                          color: AppColors.primary4,
+                          fontWeight: FontWeight.bold)),
+                  const Spacer(),
                   Image.asset(
                     "assets/img/profile.png",
                     width: 50,
@@ -45,8 +66,13 @@ class SideMenuWidget extends StatelessWidget {
                 onTap: () {},
                 child: Row(
                   children: [
-                    Text("History Log" , style: TextStyle(color: AppColors.primary4, fontWeight: FontWeight.bold),),
-                    Spacer(),
+                    Text(
+                      "History Log",
+                      style: TextStyle(
+                          color: AppColors.primary4,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
                     Image.asset(
                       "assets/img/history.png",
                       width: 50,
@@ -68,8 +94,11 @@ class SideMenuWidget extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    Text("Setting" , style: TextStyle(color: AppColors.primary4, fontWeight: FontWeight.bold)),
-                    Spacer(),
+                    Text("Setting",
+                        style: TextStyle(
+                            color: AppColors.primary4,
+                            fontWeight: FontWeight.bold)),
+                    const Spacer(),
                     Image.asset(
                       "assets/img/setting_icon.png",
                       width: 50,
@@ -79,29 +108,31 @@ class SideMenuWidget extends StatelessWidget {
                 ),
               ),
             ),
-            Spacer(),
+            const Spacer(),
             ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setBool('isLoggedIn', false);
-                    Navigator.pushReplacementNamed(
-                        context, LoginScreen.routeName);
-                  } catch (e) {
-                    print("Error logging out: $e");
-                  }
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-                // Background color,
-                child: Center(
-                  child: Text(
-                    "Log Out",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  ),
-                ))
+              onPressed: () async {
+                try {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('isLoggedIn', false);
+                  await prefs.remove('username');
+                  Navigator.pushReplacementNamed(
+                      context, LoginScreen.routeName);
+                } catch (e) {
+                  print("Error logging out: $e");
+                }
+              },
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              child: const Center(
+                child: Text(
+                  "Log Out",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+              ),
+            )
           ],
         ),
       ),

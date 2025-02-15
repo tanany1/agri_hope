@@ -52,7 +52,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           width: 500,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: AppColors.primary1, borderRadius: BorderRadius.circular(30)),
+              color: AppColors.primary1,
+              borderRadius: BorderRadius.circular(30)),
           child: Form(
             key: formKey,
             child: Padding(
@@ -125,7 +126,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary2,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -133,9 +135,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onPressed: registerAccount,
                       child: const Row(
                         children: [
-                          Text("Create an Account" , style: TextStyle(color: Colors.white),),
+                          Text(
+                            "Create an Account",
+                            style: TextStyle(color: Colors.white),
+                          ),
                           Spacer(),
-                          Icon(Icons.arrow_forward , color: Colors.white,),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: Colors.white,
+                          ),
                         ],
                       )),
                   const Spacer(flex: 6),

@@ -16,16 +16,18 @@ import 'modal/user_data.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   final userProvider = UserData();
   await userProvider.loadUsernameFromPreferences();
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => userProvider,
       child: MyApp(),
     ),
-  );
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
   );
 }
 
@@ -44,10 +46,11 @@ class MyApp extends StatelessWidget {
         FiveDayForecastScreen.routeName: (_) => FiveDayForecastScreen(
               apiKey: 'cb17b0b03b1d59110c09ffa366d71224',
             ),
-        SettingsScreen.routeName:(_)=> SettingsScreen(),
-        CropRecommendationModelScreen.routeName:(_)=> CropRecommendationModelScreen(),
-        AllModels.routeName:(_)=> AllModels(),
-        SoilTypeModelScreen.routeName:(_)=>SoilTypeModelScreen(),
+        SettingsScreen.routeName: (_) => SettingsScreen(),
+        CropRecommendationModelScreen.routeName: (_) =>
+            CropRecommendationModelScreen(),
+        AllModels.routeName: (_) => AllModels(),
+        SoilTypeModelScreen.routeName: (_) => SoilTypeModelScreen(),
       },
       initialRoute: SplashScreen.routeName,
       debugShowCheckedModeBanner: false,
