@@ -77,9 +77,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     flex: 2,
                   ),
                   TextFormField(
-                    cursorColor: AppColors.primary5,
+                    cursorColor: AppColors.primary1,
                     controller: emailController,
-                    decoration: const InputDecoration(labelText: "Email"),
+                    decoration: InputDecoration(
+                      labelStyle: TextStyle(color: Colors.white),
+                      labelText: "Email",
+                      filled: true,
+                      fillColor: AppColors.primary5,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                     validator: (text) {
                       if (text == null || text.trim().isEmpty) {
                         return "Empty Email are not Allowed";
@@ -93,12 +102,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   TextFormField(
-                    cursorColor: AppColors.primary5,
+                    cursorColor: AppColors.primary1,
                     obscureText: true,
                     obscuringCharacter: "*",
                     controller: passwordController,
-                    decoration: const InputDecoration(labelText: "Password"),
+                    decoration: InputDecoration(
+                      labelStyle: TextStyle(color: Colors.white),
+                      labelText: "Password",
+                      filled: true,
+                      fillColor: AppColors.primary5,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                     validator: (text) {
                       if (text == null || text.length < 6) {
                         return "Please Enter Valid Password";

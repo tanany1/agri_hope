@@ -115,24 +115,28 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setBool('isLoggedIn', false);
                   await prefs.remove('username');
-                  Navigator.pushReplacementNamed(
-                      context, LoginScreen.routeName);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    LoginScreen.routeName,
+                        (Route<dynamic> route) => false,
+                  );
                 } catch (e) {
                   print("Error logging out: $e");
                 }
               },
-              style:
-                  ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
               child: const Center(
                 child: Text(
                   "Log Out",
                   style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             )
+
           ],
         ),
       ),

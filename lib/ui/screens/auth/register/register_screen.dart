@@ -34,9 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "AgriHope",
           style: TextStyle(
@@ -67,9 +65,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const Spacer(flex: 2),
                   TextFormField(
-                    cursorColor: AppColors.primary5,
+                    cursorColor: AppColors.primary1,
                     controller: userNameController,
-                    decoration: const InputDecoration(labelText: "User Name"),
+                    decoration: InputDecoration(
+                      labelStyle: const TextStyle(color: Colors.white),
+                      labelText: "UserName",
+                      filled: true,
+                      fillColor: AppColors.primary5,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                     validator: (text) {
                       if (text == null || text.trim().isEmpty) {
                         return "Please Enter a Valid Name";
@@ -77,10 +84,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 20),
                   TextFormField(
-                    cursorColor: AppColors.primary5,
+                    cursorColor: AppColors.primary1,
                     controller: emailController,
-                    decoration: const InputDecoration(labelText: "Email"),
+                    decoration: InputDecoration(
+                      labelStyle: const TextStyle(color: Colors.white),
+                      labelText: "Email",
+                      filled: true,
+                      fillColor: AppColors.primary5,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                     validator: (text) {
                       if (text == null || text.trim().isEmpty) {
                         return "Empty Emails are not Allowed";
@@ -94,12 +111,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 20),
                   TextFormField(
-                    cursorColor: AppColors.primary5,
+                    cursorColor: AppColors.primary1,
                     obscureText: true,
                     obscuringCharacter: "*",
                     controller: passwordController,
-                    decoration: const InputDecoration(labelText: "Password"),
+                    decoration: InputDecoration(
+                      labelStyle: const TextStyle(color: Colors.white),
+                      labelText: "Password",
+                      filled: true,
+                      fillColor: AppColors.primary5,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                     validator: (text) {
                       if (text == null || text.length < 6) {
                         return "Please Enter a Valid Password";
@@ -107,11 +134,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 20),
                   TextFormField(
+                    cursorColor: AppColors.primary1,
                     obscureText: true,
                     obscuringCharacter: "*",
                     controller: rePasswordController,
-                    decoration: const InputDecoration(labelText: "Re-Password"),
+                    decoration: InputDecoration(
+                      labelStyle: TextStyle(color: Colors.white),
+                      labelText: "Re-Password",
+                      filled: true,
+                      fillColor: AppColors.primary5,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                     validator: (text) {
                       if (text == null || text.length < 6) {
                         return "Please Enter a Valid Password";

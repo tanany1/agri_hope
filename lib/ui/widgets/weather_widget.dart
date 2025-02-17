@@ -31,36 +31,47 @@ class _WeatherWidgetState extends State<WeatherWidget> {
     LocationPermission permission;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      setState(() {
-        errorMessage = "Location services are disabled.";
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = "Location services are disabled.";
+        });
+      }
       return;
     }
+
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        setState(() {
-          errorMessage = "Location permission denied.";
-        });
+        if (mounted) {
+          setState(() {
+            errorMessage = "Location permission denied.";
+          });
+        }
         return;
       }
     }
+
     if (permission == LocationPermission.deniedForever) {
-      setState(() {
-        errorMessage = "Location permission is permanently denied.";
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = "Location permission is permanently denied.";
+        });
+      }
       return;
     }
+
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
       await fetchWeather(position.latitude, position.longitude);
     } catch (e) {
-      setState(() {
-        errorMessage = "Failed to get location.";
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = "Failed to get location.";
+        });
+      }
     }
   }
 
@@ -68,14 +79,18 @@ class _WeatherWidgetState extends State<WeatherWidget> {
     try {
       Weather weather =
           await weatherFactory!.currentWeatherByLocation(latitude, longitude);
-      setState(() {
-        currentWeather = weather;
-        errorMessage = null;
-      });
+      if (mounted) {
+        setState(() {
+          currentWeather = weather;
+          errorMessage = null;
+        });
+      }
     } catch (e) {
-      setState(() {
-        errorMessage = "Failed to retrieve weather data.";
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = "Failed to retrieve weather data.";
+        });
+      }
     }
   }
 

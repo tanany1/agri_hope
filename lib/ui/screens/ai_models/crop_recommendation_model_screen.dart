@@ -6,6 +6,7 @@ import 'dart:async';
 
 class CropRecommendationModelScreen extends StatefulWidget {
   static const String routeName = "crop Recommendation Model";
+
   const CropRecommendationModelScreen({super.key});
 
   @override
@@ -20,10 +21,14 @@ class _CropRecommendationModelScreenState
   final TextEditingController kController = TextEditingController();
   final TextEditingController tempController = TextEditingController();
   final TextEditingController humidityController = TextEditingController();
-  final TextEditingController phController = TextEditingController();
-  final TextEditingController rainfallController = TextEditingController();
 
-  final List<double> predefinedData = [48.73, 38.42, 27.81, 23.57, 62.00121, 6.504 , 200.117];
+  final List<double> predefinedData = [
+    48.73,
+    38.42,
+    27.81,
+    23.57,
+    62.00121,
+  ];
 
   @override
   void initState() {
@@ -50,7 +55,10 @@ class _CropRecommendationModelScreenState
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text("Manual" , style:  TextStyle(color: Colors.white),),
+            child: const Text(
+              "Manual",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           TextButton(
             style: ElevatedButton.styleFrom(
@@ -64,7 +72,8 @@ class _CropRecommendationModelScreenState
               Navigator.pop(context);
               startAutomaticMode();
             },
-            child: const Text("Automatic" , style:  TextStyle(color: Colors.white)),
+            child:
+                const Text("Automatic", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -102,8 +111,6 @@ class _CropRecommendationModelScreenState
       kController.text = predefinedData[2].toString();
       tempController.text = predefinedData[3].toString();
       humidityController.text = predefinedData[4].toString();
-      phController.text = predefinedData[5].toString();
-      rainfallController.text = predefinedData[6].toString();
     });
   }
 
@@ -119,8 +126,6 @@ class _CropRecommendationModelScreenState
         "K": double.parse(kController.text),
         "temperature": double.parse(tempController.text),
         "humidity": double.parse(humidityController.text),
-        "ph": double.parse(phController.text),
-        "rainfall": double.parse(rainfallController.text),
       }),
     );
 
@@ -142,7 +147,8 @@ class _CropRecommendationModelScreenState
         actions: [
           TextButton(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary2),
+              backgroundColor:
+                  WidgetStateProperty.all<Color>(AppColors.primary2),
               foregroundColor: WidgetStateProperty.all<Color>(AppColors.white),
             ),
             onPressed: () => Navigator.pop(context),
@@ -164,7 +170,9 @@ class _CropRecommendationModelScreenState
         title: const Text(
           "AgriHope",
           style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 28, color: AppColors.white),
+              fontWeight: FontWeight.bold,
+              fontSize: 28,
+              color: AppColors.white),
         ),
         elevation: 20,
         centerTitle: true,
@@ -175,18 +183,27 @@ class _CropRecommendationModelScreenState
           Container(
             margin: EdgeInsets.all(20),
             padding: const EdgeInsets.all(30),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(25) , color: AppColors.primary2,),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              color: AppColors.primary2,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Model 1", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    Text("Crop Recommendation", style: TextStyle(color: AppColors.primary4 , fontWeight: FontWeight.bold)),
+                    Text("Model 1",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text("Crop Recommendation",
+                        style: TextStyle(
+                            color: AppColors.primary4,
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
-                const Icon(Icons.article_outlined, size: 40, color: AppColors.white),
+                const Icon(Icons.article_outlined,
+                    size: 40, color: AppColors.white),
               ],
             ),
           ),
@@ -203,9 +220,7 @@ class _CropRecommendationModelScreenState
                   buildTextField(pController, "P"),
                   buildTextField(kController, "K"),
                   buildTextField(humidityController, "Humidity"),
-                  buildTextField(phController, "PH"),
                   buildTextField(tempController, "Temp"),
-                  buildTextField(rainfallController, "Rainfall"),
                 ],
               ),
             ),
@@ -216,12 +231,14 @@ class _CropRecommendationModelScreenState
               onPressed: predictCrop,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary2,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: const Text("Recommend", style: TextStyle(fontSize: 18, color: Colors.white)),
+              child: const Text("Recommend",
+                  style: TextStyle(fontSize: 18, color: Colors.white)),
             ),
           ),
         ],
@@ -233,7 +250,8 @@ class _CropRecommendationModelScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 5),
         TextField(
           controller: controller,

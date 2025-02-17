@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../modal/user_data.dart';
 import '../utils/app_color.dart';
 import '../widgets/side_menu_widget.dart';
 import '../widgets/weather_widget.dart';
@@ -40,22 +37,6 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   const WeatherWidget(),
-                  const SizedBox(height: 50),
-                  Consumer<UserData>(
-                    builder: (context, userData, child) {
-                      String displayName = userData.username.isNotEmpty
-                          ? userData.username
-                          : "Guest";
-                      return Text(
-                        "Welcome, $displayName!",
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
                   Container(
                     width: 1400,
                     height: 400,
