@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/app_color.dart';
+import '../widgets/chat_bot_widget.dart';
 import '../widgets/side_menu_widget.dart';
 import '../widgets/weather_widget.dart';
 import 'all_models.dart';
@@ -172,7 +173,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          // ChatBotIcon(),
+          ChatBotIcon(),
         ],
       ),
     );

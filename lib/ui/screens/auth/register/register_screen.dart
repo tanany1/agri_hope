@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -198,10 +197,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!formKey.currentState!.validate()) return;
     DialogUtils.showLoading(context);
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
       DialogUtils.hideLoading(context);
       final String username = userNameController.text;
       final prefs = await SharedPreferences.getInstance();
@@ -218,34 +213,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         arguments: {
           'email': emailController.text,
           'generatedOtp': otp,
+          'password': passwordController.text,
         },
       );
-    } on FirebaseAuthException catch (e) {
-      DialogUtils.hideLoading(context);
-      if (e.code == 'weak-password') {
-        DialogUtils.showError(context, 'The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        DialogUtils.showError(
-            context, 'The account already exists for that email.');
-      } else {
-        DialogUtils.showError(
-            context, 'Something went wrong. Please try again later.');
-      }
     } catch (e) {
       DialogUtils.hideLoading(context);
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Error'),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            )
-          ],
-        ),
-      );
+      DialogUtils.showError(
+          context, 'Something went wrong. Please try again later.');
     }
   }
 

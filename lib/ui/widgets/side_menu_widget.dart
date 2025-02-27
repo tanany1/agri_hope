@@ -118,13 +118,14 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     LoginScreen.routeName,
-                        (Route<dynamic> route) => false,
+                    (Route<dynamic> route) => false,
                   );
                 } catch (e) {
                   print("Error logging out: $e");
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
               child: const Center(
                 child: Text(
                   "Log Out",
@@ -136,7 +137,6 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
                 ),
               ),
             )
-
           ],
         ),
       ),
