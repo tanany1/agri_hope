@@ -1,13 +1,17 @@
 import 'package:agri_hope/ui/screens/ai_models/soil_type_model.dart';
 import 'package:agri_hope/ui/widgets/model_card_widget.dart';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_color.dart';
 import 'ai_models/crop_recommendation_model_screen.dart';
 
 class AllModels extends StatelessWidget {
   static const String routeName = "All Models";
 
+  Future<void> saveModelName(String modelName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_used_model', modelName);
+  }
   const AllModels({super.key});
 
   @override
@@ -70,7 +74,8 @@ class AllModels extends StatelessWidget {
               itemBuilder: (context, index) {
                 final model = models[index];
                 return InkWell(
-                  onTap: () {
+                  onTap:  () async {
+                    await saveModelName(model["modelName"]!);
                     Navigator.pushNamed(context, model["routeName"]!);
                   },
                   child: ModelCardWidget(

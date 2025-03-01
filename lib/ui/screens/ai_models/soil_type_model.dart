@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SoilTypeModelScreen extends StatefulWidget {
   static const String routeName = "SoilTypeModel";
@@ -41,13 +42,20 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
     }
   }
 
+  Future<void> _savePrediction(String soilType, double confidence) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("latest_soil_type", soilType);
+    await prefs.setDouble("latest_soil_confidence", confidence);
+  }
+
   Future<void> _predictSoilType(File imageFile) async {
-    const String apiUrl = "http://127.0.0.1:5000/soiltype";
+    const String apiUrl = "http://127.0.0.1:5000/soiltype"; // Update with actual API URL
     try {
       var request = http.MultipartRequest("POST", Uri.parse(apiUrl));
       request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
+
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         setState(() {
@@ -56,6 +64,9 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
           _statusMessage = jsonData["status"];
           _isLoading = false;
         });
+
+        // Save to SharedPreferences
+        await _savePrediction(_predictedSoil!, _confidence!);
       } else {
         setState(() {
           _statusMessage = "Failed: ${response.statusCode}, ${response.body}";
@@ -70,19 +81,15 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Soil Type Model",
-          style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 28, color: AppColors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: AppColors.white),
         ),
         elevation: 20,
         centerTitle: true,
@@ -90,7 +97,10 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
       ),
       body: Center(
         child: Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(25) , color: AppColors.primary1,),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            color: AppColors.primary1,
+          ),
           width: 600,
           height: 600,
           child: Padding(
@@ -108,8 +118,8 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
                   Column(
                     children: [
                       ElevatedButton.icon(
-                        icon: const Icon(Icons.photo_library , color: Colors.white,),
-                        label: const Text("Pick from Gallery" , style: TextStyle(color: AppColors.white),),
+                        icon: const Icon(Icons.photo_library, color: Colors.white),
+                        label: const Text("Pick from Gallery", style: TextStyle(color: AppColors.white)),
                         onPressed: () => _pickImage(ImageSource.gallery),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                       ),

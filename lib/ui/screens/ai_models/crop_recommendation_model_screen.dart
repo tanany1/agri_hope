@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CropRecommendationModelScreen extends StatefulWidget {
   static const String routeName = "crop Recommendation Model";
@@ -22,13 +23,7 @@ class _CropRecommendationModelScreenState
   final TextEditingController tempController = TextEditingController();
   final TextEditingController humidityController = TextEditingController();
 
-  final List<double> predefinedData = [
-    48.73,
-    38.42,
-    27.81,
-    23.57,
-    62.00121,
-  ];
+  final List<double> predefinedData = [48.73, 38.42, 27.81, 23.57, 62.00121];
 
   @override
   void initState() {
@@ -37,6 +32,7 @@ class _CropRecommendationModelScreenState
   }
 
   void showModeSelectionDialog() {
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -53,12 +49,9 @@ class _CropRecommendationModelScreenState
               ),
             ),
             onPressed: () {
-              Navigator.pop(context);
+              if (mounted) Navigator.pop(context);
             },
-            child: const Text(
-              "Manual",
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text("Manual", style: TextStyle(color: Colors.white)),
           ),
           TextButton(
             style: ElevatedButton.styleFrom(
@@ -69,7 +62,7 @@ class _CropRecommendationModelScreenState
               ),
             ),
             onPressed: () {
-              Navigator.pop(context);
+              if (mounted) Navigator.pop(context);
               startAutomaticMode();
             },
             child:
@@ -81,30 +74,29 @@ class _CropRecommendationModelScreenState
   }
 
   void startAutomaticMode() {
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            Future.delayed(const Duration(seconds: 2), () {
-              setState(() {});
-              Future.delayed(const Duration(seconds: 2), () {
-                Navigator.pop(context);
-                fillAutomaticData();
-              });
-            });
-            return AlertDialog(
-              title: const Text("Connecting..."),
-              content: const Text("Connecting to hardware..."),
-            );
-          },
+        return AlertDialog(
+          title: const Text("Connecting..."),
+          content: const Text("Connecting to hardware..."),
         );
       },
     );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      if (Navigator.of(context).canPop()) {
+        Navigator.pop(context);
+      }
+      fillAutomaticData();
+    });
   }
 
   void fillAutomaticData() {
+    if (!mounted) return;
     setState(() {
       nController.text = predefinedData[0].toString();
       pController.text = predefinedData[1].toString();
@@ -117,27 +109,38 @@ class _CropRecommendationModelScreenState
   Future<void> predictCrop() async {
     final Uri apiUrl = Uri.parse("http://127.0.0.1:5000/croprecommendation");
 
-    final response = await http.post(
-      apiUrl,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "N": double.parse(nController.text),
-        "P": double.parse(pController.text),
-        "K": double.parse(kController.text),
-        "temperature": double.parse(tempController.text),
-        "humidity": double.parse(humidityController.text),
-      }),
-    );
+    try {
+      final response = await http.post(
+        apiUrl,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "N": double.tryParse(nController.text) ?? 0.0,
+          "P": double.tryParse(pController.text) ?? 0.0,
+          "K": double.tryParse(kController.text) ?? 0.0,
+          "temperature": double.tryParse(tempController.text) ?? 0.0,
+          "humidity": double.tryParse(humidityController.text) ?? 0.0,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final result = jsonDecode(response.body);
-      showResultDialog(result["message"]);
-    } else {
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        await saveResultMessage(result["message"]);
+        showResultDialog(result["message"]);
+      } else {
+        showResultDialog("Error: Unable to fetch prediction");
+      }
+    } catch (e) {
       showResultDialog("Error: Unable to fetch prediction");
     }
   }
 
+  Future<void> saveResultMessage(String message) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_result_message', message);
+  }
+
   void showResultDialog(String message) {
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -151,7 +154,11 @@ class _CropRecommendationModelScreenState
                   WidgetStateProperty.all<Color>(AppColors.primary2),
               foregroundColor: WidgetStateProperty.all<Color>(AppColors.white),
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              if (mounted && Navigator.of(context).canPop()) {
+                Navigator.pop(context);
+              }
+            },
             child: const Text("OK"),
           ),
         ],
@@ -164,15 +171,14 @@ class _CropRecommendationModelScreenState
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "AgriHope",
           style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 28,
-              color: AppColors.white),
+            fontWeight: FontWeight.bold,
+            fontSize: 28,
+            color: AppColors.white,
+          ),
         ),
         elevation: 20,
         centerTitle: true,
@@ -181,7 +187,7 @@ class _CropRecommendationModelScreenState
       body: Column(
         children: [
           Container(
-            margin: EdgeInsets.all(20),
+            margin: const EdgeInsets.all(20),
             padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25),
