@@ -4,10 +4,12 @@ import 'package:agri_hope/ui/screens/all_models.dart';
 import 'package:agri_hope/ui/screens/auth/login/login_screen.dart';
 import 'package:agri_hope/ui/screens/auth/otp/otp_verification.dart';
 import 'package:agri_hope/ui/screens/auth/register/register_screen.dart';
+import 'package:agri_hope/ui/screens/history_log/history_log_screen.dart';
 import 'package:agri_hope/ui/screens/home_screen.dart';
 import 'package:agri_hope/ui/screens/settings/settings_screen.dart';
 import 'package:agri_hope/ui/screens/splash/splash_screen.dart';
 import 'package:agri_hope/ui/widgets/5days_forecast_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,19 +22,13 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final userProvider = UserData();
-  await userProvider.loadUsernameFromPreferences();
-
   runApp(
     ChangeNotifierProvider(
-      create: (_) => userProvider,
-      child: MyApp(),
+      create: (_) => UserData(),
+      child: const MyApp(),
     ),
   );
 }
-
-final RouteObserver<ModalRoute<void>> routeObserver =
-    RouteObserver<ModalRoute<void>>();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -40,7 +36,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorObservers: [routeObserver],
+      navigatorObservers: [RouteObserver<ModalRoute<void>>()],
+      initialRoute: SplashScreen.routeName,
       routes: {
         LoginScreen.routeName: (_) => const LoginScreen(),
         RegisterScreen.routeName: (_) => const RegisterScreen(),
@@ -48,16 +45,19 @@ class MyApp extends StatelessWidget {
         SplashScreen.routeName: (_) => const SplashScreen(),
         OTPVerification.routeName: (_) => const OTPVerification(),
         FiveDayForecastScreen.routeName: (_) => FiveDayForecastScreen(
-              apiKey: 'cb17b0b03b1d59110c09ffa366d71224',
-            ),
+          apiKey: 'cb17b0b03b1d59110c09ffa366d71224',
+        ),
         SettingsScreen.routeName: (_) => SettingsScreen(),
         CropRecommendationModelScreen.routeName: (_) =>
             CropRecommendationModelScreen(),
         AllModels.routeName: (_) => AllModels(),
         SoilTypeModelScreen.routeName: (_) => SoilTypeModelScreen(),
+        HistoryLogScreen.routeName: (_) => HistoryLogScreen(),
       },
-      initialRoute: SplashScreen.routeName,
       debugShowCheckedModeBanner: false,
     );
   }
 }
+
+final RouteObserver<ModalRoute<void>> routeObserver =
+RouteObserver<ModalRoute<void>>();

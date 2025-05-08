@@ -1,3 +1,4 @@
+import 'package:agri_hope/ui/screens/history_log/history_log_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -63,7 +64,9 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, HistoryLogScreen.routeName);
+                },
                 child: Row(
                   children: [
                     Text(
