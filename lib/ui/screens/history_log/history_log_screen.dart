@@ -5,12 +5,13 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../utils/app_color.dart';
 import '../ai_models/crop_recommendation_model_screen.dart';
 
 class LandMeasurement {
-  final String id; // Changed to String for Firestore document ID
+  final String id;
   late final String tag;
   final DateTime timestamp;
   final double n;
@@ -19,6 +20,7 @@ class LandMeasurement {
   final double humidity;
   final double temperature;
   String landName;
+  final String userId;
 
   LandMeasurement({
     required this.id,
@@ -30,19 +32,23 @@ class LandMeasurement {
     required this.humidity,
     required this.temperature,
     required this.landName,
+    required this.userId,
   });
 
   factory LandMeasurement.fromJson(Map<String, dynamic> json, String docId) {
     return LandMeasurement(
       id: docId,
       tag: json['tag'] ?? 'Tag-$docId',
-      timestamp: DateTime.parse(json['timestamp']),
+      timestamp: json['timestamp'] is String
+          ? DateTime.parse(json['timestamp'])
+          : (json['timestamp'] as Timestamp).toDate(),
       n: json['n']?.toDouble() ?? 0.0,
       p: json['p']?.toDouble() ?? 0.0,
       k: json['k']?.toDouble() ?? 0.0,
       humidity: json['humidity']?.toDouble() ?? 0.0,
       temperature: json['temperature']?.toDouble() ?? 0.0,
       landName: json['land_name'] ?? 'Land-$docId',
+      userId: json['user_id'] ?? '',
     );
   }
 
@@ -56,6 +62,7 @@ class LandMeasurement {
       'humidity': humidity,
       'temperature': temperature,
       'land_name': landName,
+      'user_id': userId,
     };
   }
 }
@@ -70,19 +77,40 @@ class HistoryLogScreen extends StatefulWidget {
 
 class _HistoryLogScreenState extends State<HistoryLogScreen> {
   final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
 
+  User? currentUser;
   Map<String, List<LandMeasurement>> landMeasurements = {};
   List<String> selectedTags = [];
   String? selectedLand;
   bool isLoading = true;
+  bool isAverageSelected = false;
 
   @override
   void initState() {
     super.initState();
-    fetchMeasurements();
+    _getCurrentUser();
+  }
+
+  Future<void> _getCurrentUser() async {
+    currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      setState(() {
+        isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please log in to view your measurement history')),
+        );
+      }
+    } else {
+      fetchMeasurements();
+    }
   }
 
   Future<void> fetchMeasurements() async {
+    if (currentUser == null) return;
+
     setState(() {
       isLoading = true;
     });
@@ -90,25 +118,36 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
     try {
       final querySnapshot = await _firestore
           .collection('measurements')
+          .where('user_id', isEqualTo: currentUser!.uid)
           .orderBy('timestamp', descending: true)
           .get();
 
       final measurements = querySnapshot.docs
-          .map((doc) => LandMeasurement.fromJson(doc.data(), doc.id))
+          .map((doc) => LandMeasurement.fromJson(doc.data() as Map<String, dynamic>, doc.id))
+          .whereType<LandMeasurement>() // Filter out null values
           .toList();
 
-      landMeasurements = groupBy(measurements, (LandMeasurement m) => m.landName);
+      if (measurements.isEmpty) {
+        landMeasurements.clear();
+      } else {
+        landMeasurements = groupBy(measurements, (LandMeasurement m) => m.landName);
+      }
+
+      if (selectedLand == null && landMeasurements.isNotEmpty) {
+        selectedLand = landMeasurements.keys.first;
+      }
 
       setState(() {
         isLoading = false;
       });
     } catch (e) {
+      print('Error fetching measurements: $e');
       setState(() {
         isLoading = false;
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error fetching data: $e')),
+          SnackBar(content: Text('Error fetching data: ${e.toString()}')),
         );
       }
     }
@@ -152,7 +191,6 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
     ]);
 
     try {
-      // Use getApplicationDocumentsDirectory() for desktop (app-specific directory)
       final directory = await getApplicationDocumentsDirectory();
       final path = '${directory.path}/${selectedLand}_measurements.csv';
       final file = File(path);
@@ -175,24 +213,51 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
   }
 
   void _sendToAIModel() {
-    if (selectedLand == null || selectedTags.isEmpty) {
+    if (selectedLand == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a land and at least one tag')),
+        const SnackBar(content: Text('Please select a land first')),
       );
       return;
     }
 
-    final measurements = landMeasurements[selectedLand!]!
-        .where((m) => selectedTags.contains(m.tag))
-        .toList();
-
+    final measurements = landMeasurements[selectedLand!] ?? [];
     if (measurements.isEmpty) return;
 
-    double avgN = measurements.map((m) => m.n).average;
-    double avgP = measurements.map((m) => m.p).average;
-    double avgK = measurements.map((m) => m.k).average;
-    double avgTemp = measurements.map((m) => m.temperature).average;
-    double avgHumidity = measurements.map((m) => m.humidity).average;
+    double avgN;
+    double avgP;
+    double avgK;
+    double avgTemp;
+    double avgHumidity;
+
+    if (isAverageSelected) {
+      avgN = measurements.map((m) => m.n).average;
+      avgP = measurements.map((m) => m.p).average;
+      avgK = measurements.map((m) => m.k).average;
+      avgTemp = measurements.map((m) => m.temperature).average;
+      avgHumidity = measurements.map((m) => m.humidity).average;
+    } else if (selectedTags.isNotEmpty) {
+      final selectedMeasurements = measurements
+          .where((m) => selectedTags.contains(m.tag))
+          .toList();
+
+      if (selectedMeasurements.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select at least one tag or the average row')),
+        );
+        return;
+      }
+
+      avgN = selectedMeasurements.map((m) => m.n).average;
+      avgP = selectedMeasurements.map((m) => m.p).average;
+      avgK = selectedMeasurements.map((m) => m.k).average;
+      avgTemp = selectedMeasurements.map((m) => m.temperature).average;
+      avgHumidity = selectedMeasurements.map((m) => m.humidity).average;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select at least one tag or the average row')),
+      );
+      return;
+    }
 
     Navigator.of(context).pushNamed(
       CropRecommendationModelScreen.routeName,
@@ -209,13 +274,13 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
   }
 
   Future<void> _updateLandName(String oldName, String newName) async {
-    if (oldName == newName || newName.isEmpty) return;
+    if (oldName == newName || newName.isEmpty || currentUser == null) return;
 
     try {
-      // Update all documents with the old land_name
       final querySnapshot = await _firestore
           .collection('measurements')
           .where('land_name', isEqualTo: oldName)
+          .where('user_id', isEqualTo: currentUser!.uid)
           .get();
 
       final batch = _firestore.batch();
@@ -224,7 +289,6 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
       }
       await batch.commit();
 
-      // Update locally
       final measurements = landMeasurements[oldName] ?? [];
       for (var measurement in measurements) {
         measurement.landName = newName;
@@ -253,16 +317,23 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
 
   Future<void> _updateMeasurementTag(
       LandMeasurement measurement, String newTag) async {
-    if (measurement.tag == newTag || newTag.isEmpty) return;
+    if (measurement.tag == newTag || newTag.isEmpty || currentUser == null) return;
+
+    if (measurement.userId != currentUser!.uid) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You can only update your own measurements')),
+        );
+      }
+      return;
+    }
 
     try {
-      // Update in Firestore
       await _firestore
           .collection('measurements')
           .doc(measurement.id)
           .update({'tag': newTag});
 
-      // Update locally
       setState(() {
         measurement.tag = newTag;
         if (selectedTags.contains(measurement.tag)) {
@@ -286,10 +357,13 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
   }
 
   Future<void> _deleteLand(String landName) async {
+    if (currentUser == null) return;
+
     try {
       final querySnapshot = await _firestore
           .collection('measurements')
           .where('land_name', isEqualTo: landName)
+          .where('user_id', isEqualTo: currentUser!.uid)
           .get();
 
       final batch = _firestore.batch();
@@ -298,11 +372,11 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
       }
       await batch.commit();
 
-      // Update locally
       landMeasurements.remove(landName);
       if (selectedLand == landName) {
         selectedLand = null;
         selectedTags.clear();
+        isAverageSelected = false;
       }
       setState(() {});
 
@@ -392,6 +466,7 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
           setState(() {
             selectedLand = landName;
             selectedTags = [];
+            isAverageSelected = false;
           });
         },
         child: Padding(
@@ -449,6 +524,12 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
   }
 
   Widget _buildMeasurementsTable() {
+    if (currentUser == null) {
+      return const Center(
+        child: Text('Please log in to view your measurement history'),
+      );
+    }
+
     if (selectedLand == null) {
       return const Center(
         child: Text('Select a land to view measurements'),
@@ -533,22 +614,13 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
                 ],
                 rows: [
                   ...measurements.map((measurement) => DataRow(
-                    selected: selectedTags.contains(measurement.tag),
-                    onSelectChanged: (selected) {
-                      setState(() {
-                        if (selected != null && selected) {
-                          selectedTags.add(measurement.tag);
-                        } else {
-                          selectedTags.remove(measurement.tag);
-                        }
-                      });
-                    },
                     cells: [
                       DataCell(Checkbox(
                         value: selectedTags.contains(measurement.tag),
                         onChanged: (value) {
                           setState(() {
                             if (value != null && value) {
+                              isAverageSelected = false;
                               selectedTags.add(measurement.tag);
                             } else {
                               selectedTags.remove(measurement.tag);
@@ -578,10 +650,21 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
                     ],
                   )),
                   DataRow(
-                    color:
-                    MaterialStateProperty.all(AppColors.primary1.withOpacity(0.2)),
+                    color: MaterialStateProperty.all(AppColors.primary1.withOpacity(0.2)),
                     cells: [
-                      const DataCell(Text('')),
+                      DataCell(Checkbox(
+                        value: isAverageSelected,
+                        onChanged: (value) {
+                          setState(() {
+                            if (value != null && value) {
+                              isAverageSelected = true;
+                              selectedTags.clear();
+                            } else {
+                              isAverageSelected = false;
+                            }
+                          });
+                        },
+                      )),
                       const DataCell(
                           Text('AVERAGE', style: TextStyle(fontWeight: FontWeight.bold))),
                       const DataCell(Text('')),
@@ -612,8 +695,9 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          "History Log",
+          "My History Log",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -624,6 +708,19 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
         centerTitle: true,
         elevation: 4,
         actions: [
+          if (currentUser != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Center(
+                child: Text(
+                  currentUser?.email ?? 'User',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: fetchMeasurements,
@@ -633,6 +730,29 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
+          : currentUser == null
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Please log in to view your measurement history',
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "login");
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary3,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              child: const Text('Go to Login'),
+            ),
+          ],
+        ),
+      )
           : Row(
         children: [
           Container(
@@ -650,7 +770,7 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
                 const Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Text(
-                    'Lands',
+                    'My Lands',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -659,7 +779,16 @@ class _HistoryLogScreenState extends State<HistoryLogScreen> {
                 ),
                 Expanded(
                   child: landMeasurements.isEmpty
-                      ? const Center(child: Text('No lands available'))
+                      ? const Center(
+                    child: Text(
+                      'No lands available\nMeasurements will appear here after you take some readings.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
                       : ListView(
                     children: landMeasurements.keys
                         .map((landName) => _buildLandCard(landName))

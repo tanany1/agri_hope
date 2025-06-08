@@ -159,9 +159,11 @@ class _ChatBotIconState extends State<ChatBotIcon> {
                             Expanded(
                               child: TextField(
                                 controller: _controller,
+                                maxLength: 5000, // Limit to 5000 characters
                                 decoration: InputDecoration(
-                                  hintText: 'Ask AgriHopeBot...',
+                                  hintText: 'Ask AgriHopeBot... (Max 5000 characters)',
                                   border: InputBorder.none,
+                                  counterText: '', // Hide the character counter
                                 ),
                                 onSubmitted: (message) {
                                   sendMessage(message);
@@ -192,8 +194,8 @@ class _ChatBotIconState extends State<ChatBotIcon> {
                   padding: EdgeInsets.all(20),
                   child: FloatingActionButton(
                     onPressed: _toggleChat,
-                    child: Icon(_isChatOpen ? Icons.close : Icons.chat , color: Colors.white,),
-                    backgroundColor:AppColors.primary3,
+                    child: Icon(_isChatOpen ? Icons.close : Icons.chat, color: Colors.white),
+                    backgroundColor: AppColors.primary3,
                   ),
                 ),
               ),

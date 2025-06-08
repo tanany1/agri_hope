@@ -20,10 +20,11 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool _isPasswordVisible = false;
 
+  @override
   void initState() {
     super.initState();
     checkLoginState();
@@ -42,9 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "AgriHope",
           style: TextStyle(
@@ -73,14 +72,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     "Log in With Your Account",
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const Spacer(
-                    flex: 2,
-                  ),
+                  const Spacer(flex: 2),
                   TextFormField(
                     cursorColor: AppColors.primary1,
                     controller: emailController,
                     decoration: InputDecoration(
-                      labelStyle: TextStyle(color: Colors.white),
+                      labelStyle: const TextStyle(color: Colors.white),
                       labelText: "Email",
                       filled: true,
                       fillColor: AppColors.primary5,
@@ -94,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         return "Empty Email are not Allowed";
                       }
                       final bool emailValid = RegExp(
-                              r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                          r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                           .hasMatch(text);
                       if (!emailValid) {
                         return "This Email is not Allowed";
@@ -102,22 +99,33 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   TextFormField(
                     cursorColor: AppColors.primary1,
-                    obscureText: true,
+                    obscureText: !_isPasswordVisible,
                     obscuringCharacter: "*",
                     controller: passwordController,
                     decoration: InputDecoration(
-                      labelStyle: TextStyle(color: Colors.white),
+                      labelStyle: const TextStyle(color: Colors.white),
                       labelText: "Password",
                       filled: true,
                       fillColor: AppColors.primary5,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
                       ),
                     ),
                     validator: (text) {
@@ -127,37 +135,51 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const Spacer(
-                    flex: 4,
-                  ),
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary2,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      onTap: () {
+                        _resetPassword();
+                      },
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.black,
                         ),
                       ),
-                      onPressed: () {
-                        login();
-                      },
-                      child: const Row(
-                        children: [
-                          Text(
-                            "Log In",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                          ),
-                        ],
-                      )),
-                  const SizedBox(
-                    height: 10,
+                    ),
                   ),
+                  const Spacer(flex: 4),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary2,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: () {
+                      login();
+                    },
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Log In",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        SizedBox(width: 10),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   InkWell(
                     onTap: () {
                       Navigator.pushNamed(context, RegisterScreen.routeName);
@@ -165,25 +187,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text(
                       "Don't have an Account? Sign Up Now",
                       textAlign: TextAlign.center,
-                      style: TextStyle(decoration: TextDecoration.underline),
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, HomeScreen.routeName);
-                    },
-                    child: const Text(
-                      "Continue as A Guest",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(decoration: TextDecoration.underline),
-                    ),
-                  ),
-                  const Spacer(
-                    flex: 6,
-                  ),
+                  const Spacer(flex: 6),
                 ],
               ),
             ),
@@ -201,6 +211,8 @@ class _LoginScreenState extends State<LoginScreen> {
         email: emailController.text,
         password: passwordController.text,
       );
+
+      // Get user document using UID
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(credential.user!.uid)
@@ -208,9 +220,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (userDoc.exists) {
         final username = userDoc.data()?['username'] ?? 'Guest';
+        final email = emailController.text;
+
+        // Store both username, email and uid in shared preferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('username', username);
+        await prefs.setString('email', email);
+        await prefs.setString('uid', credential.user!.uid);
         await prefs.setBool('isLoggedIn', true);
+
         Provider.of<UserData>(context, listen: false).setUsername(username);
       } else {
         DialogUtils.showError(context, 'User data not found.');
@@ -219,33 +237,50 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacementNamed(context, HomeScreen.routeName);
     } on FirebaseAuthException catch (e) {
       DialogUtils.hideLoading(context);
-      if (e.code == 'user-not-found') {
-        DialogUtils.showError(context, 'No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        DialogUtils.showError(context, 'Wrong password provided.');
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        DialogUtils.showError(context, 'Invalid Email or Password.');
       } else {
         DialogUtils.showError(
-            context, 'Something went wrong. Try again later.');
+            context, 'Assure Your Credentials. Try again.');
       }
     }
   }
 
-  Future<String?> fetchUsernameFromDatabase(String email) async {
-    try {
-      final userCollection = FirebaseFirestore.instance.collection('users');
-      final userDoc =
-          await userCollection.where('email', isEqualTo: email).get();
+  Future<void> _resetPassword() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      DialogUtils.showError(context, 'Please enter your email to reset password.');
+      return;
+    }
+    // Validate email format
+    final bool emailValid = RegExp(
+        r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
+    if (!emailValid) {
+      DialogUtils.showError(context, 'Please enter a valid email address.');
+      return;
+    }
 
-      if (userDoc.docs.isNotEmpty) {
-        String username = userDoc.docs.first.data()['username'];
-        print('Fetched Username: $username');
-        return username;
+    try {
+      DialogUtils.showLoading(context);
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: email);
+      DialogUtils.hideLoading(context);
+      DialogUtils.showSuccess(context,
+          'Password reset email sent to $email. Please follow the instructions in your inbox to reset your password.');
+    } on FirebaseAuthException catch (e) {
+      DialogUtils.hideLoading(context);
+      if (e.code == 'user-not-found') {
+        DialogUtils.showError(context, 'No user found for that email.');
+      } else if (e.code == 'invalid-email') {
+        DialogUtils.showError(context, 'The email address is not valid.');
       } else {
-        print('No user found for this email');
+        DialogUtils.showError(
+            context, 'Something went wrong. Please try again later.');
       }
     } catch (e) {
-      print('Error fetching username: $e');
+      DialogUtils.hideLoading(context);
+      DialogUtils.showError(context, 'An unexpected error occurred. Try again.');
     }
-    return null;
   }
 }

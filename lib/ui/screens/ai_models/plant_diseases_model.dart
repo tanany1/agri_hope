@@ -7,16 +7,18 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart'; // For logging
 
-class SoilTypeModelScreen extends StatefulWidget {
-  static const String routeName = "SoilTypeModel";
+class PlantDiseasesDetectionModelScreen extends StatefulWidget {
+  static const String routeName = "PlantDiseaseDetectionModel";
 
   @override
-  _SoilTypeModelScreenState createState() => _SoilTypeModelScreenState();
+  _PlantDiseasesDetectionModelScreenState createState() =>
+      _PlantDiseasesDetectionModelScreenState();
 }
 
-class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
+class _PlantDiseasesDetectionModelScreenState
+    extends State<PlantDiseasesDetectionModelScreen> {
   File? _image;
-  String? _predictedSoil;
+  String? _predictedDisease;
   double? _confidence;
   String? _statusMessage;
   bool _isLoading = false;
@@ -65,7 +67,7 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
       if (pickedFile != null) {
         setState(() {
           _image = File(pickedFile.path);
-          _predictedSoil = null;
+          _predictedDisease = null;
           _confidence = null;
           _statusMessage = null;
           _isLoading = true;
@@ -73,7 +75,7 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
 
         // Validate image before predicting
         if (await _validateImage(_image!)) {
-          await _predictSoilType(_image!);
+          await _predictDisease(_image!);
         }
       }
     } catch (e) {
@@ -85,11 +87,11 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
     }
   }
 
-  Future<void> _savePrediction(String soilType, double confidence) async {
+  Future<void> _savePrediction(String detectedDisease, double confidence) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString("latest_soil_type", soilType);
-      await prefs.setDouble("latest_soil_confidence", confidence);
+      await prefs.setString("latest_detected_disease", detectedDisease);
+      await prefs.setDouble("latest_confidence", confidence);
     } catch (e) {
       _logger.e("Failed to save prediction: $e");
       setState(() {
@@ -98,8 +100,8 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
     }
   }
 
-  Future<void> _predictSoilType(File imageFile) async {
-    const String apiUrl = "http://127.0.0.1:5000/soiltype"; // Update with actual API URL
+  Future<void> _predictDisease(File imageFile) async {
+    const String apiUrl = "http://127.0.0.1:5000/plantdisease"; // Update with actual API URL
     try {
       var request = http.MultipartRequest("POST", Uri.parse(apiUrl));
       request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
@@ -113,31 +115,31 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
-    setState(() {
-    _predictedSoil = jsonData["predicted_class"];
-    _confidence = jsonData["confidence"];
-    _statusMessage = "Success";
-    _isLoading = false;
-    });
+        setState(() {
+          _predictedDisease = jsonData["predicted_class"];
+          _confidence = jsonData["confidence"];
+          _statusMessage = "Success";
+          _isLoading = false;
+        });
 
-    // Save to SharedPreferences
-    await _savePrediction(_predictedSoil!, _confidence!);
-    } else {
-    _logger.e("API request failed: ${response.statusCode}, ${response.body}");
-    setState(() {
-    _statusMessage = _httpErrorMessages[response.statusCode] ??
-    "An error occurred while processing the image. Please try again.";
-    _isLoading = false;
-    });
-    }
+        // Save to SharedPreferences
+        await _savePrediction(_predictedDisease!, _confidence!);
+      } else {
+        _logger.e("API request failed: ${response.statusCode}, ${response.body}");
+        setState(() {
+          _statusMessage = _httpErrorMessages[response.statusCode] ??
+              "An error occurred while processing the image. Please try again.";
+          _isLoading = false;
+        });
+      }
     } catch (error) {
-    _logger.e("Error predicting soil type: $error");
-    setState(() {
-    _statusMessage = error.toString().contains("timed out")
-    ? "Connection timed out. Please check your network and try again."
-        : "An error occurred while processing the image. Please try again.";
-    _isLoading = false;
-    });
+      _logger.e("Error predicting disease: $error");
+      setState(() {
+        _statusMessage = error.toString().contains("timed out")
+            ? "Connection timed out. Please check your network and try again."
+            : "An error occurred while processing the image. Please try again.";
+        _isLoading = false;
+      });
     }
   }
 
@@ -148,7 +150,7 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          "Soil Type Model",
+          "Plant Disease Detection Model",
           style: TextStyle(
               fontWeight: FontWeight.bold, fontSize: 28, color: AppColors.white),
         ),
@@ -198,12 +200,12 @@ class _SoilTypeModelScreenState extends State<SoilTypeModelScreen> {
                       color: _statusMessage == "Success" ? Colors.green : Colors.red,
                     ),
                   ),
-                if (_predictedSoil != null)
+                if (_predictedDisease != null)
                   Column(
                     children: [
                       const SizedBox(height: 10),
                       Text(
-                        "Predicted Soil Type: $_predictedSoil",
+                        "Detected Disease: $_predictedDisease",
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),

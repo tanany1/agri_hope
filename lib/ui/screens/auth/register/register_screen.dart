@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../modal/user_data.dart';
 import '../../../utils/app_color.dart';
 import '../../../utils/dialog_utils.dart';
 import '../otp/otp_verification.dart';
@@ -27,6 +25,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     username: 'agriHope422@gmail.com',
     password: 'knjy lqvs hcjm pgrl',
   );
+  bool _isPasswordVisible = false;
+  bool _isRePasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +60,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const Spacer(),
                   const Text(
                     "Sign Up a New Account",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                   const Spacer(flex: 2),
                   TextFormField(
@@ -102,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return "Empty Emails are not Allowed";
                       }
                       final bool emailValid = RegExp(
-                              r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                          r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                           .hasMatch(text);
                       if (!emailValid) {
                         return "This Email is not Allowed";
@@ -113,7 +117,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 20),
                   TextFormField(
                     cursorColor: AppColors.primary1,
-                    obscureText: true,
+                    obscureText: !_isPasswordVisible,
                     obscuringCharacter: "*",
                     controller: passwordController,
                     decoration: InputDecoration(
@@ -125,10 +129,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
                     ),
                     validator: (text) {
-                      if (text == null || text.length < 6) {
+                      if (text == null || text.length < 8) {
                         return "Please Enter a Valid Password";
+                      }
+                      final bool passwordValid = RegExp(
+                          r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]")
+                          .hasMatch(text);
+                      if (!passwordValid) {
+                        return "This Password is not Allowed";
                       }
                       return null;
                     },
@@ -136,11 +159,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 20),
                   TextFormField(
                     cursorColor: AppColors.primary1,
-                    obscureText: true,
+                    obscureText: !_isRePasswordVisible,
                     obscuringCharacter: "*",
                     controller: rePasswordController,
                     decoration: InputDecoration(
-                      labelStyle: TextStyle(color: Colors.white),
+                      labelStyle: const TextStyle(color: Colors.white),
                       labelText: "Re-Password",
                       filled: true,
                       fillColor: AppColors.primary5,
@@ -148,10 +171,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isRePasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isRePasswordVisible = !_isRePasswordVisible;
+                          });
+                        },
+                      ),
                     ),
                     validator: (text) {
-                      if (text == null || text.length < 6) {
+                      if (text == null || text.length < 8) {
                         return "Please Enter a Valid Password";
+                      }
+                      final bool passwordValid = RegExp(
+                          r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]")
+                          .hasMatch(text);
+                      if (!passwordValid) {
+                        return "This Password is not Allowed";
                       }
                       if (text != passwordController.text) {
                         return "Passwords do not Match";
@@ -161,28 +203,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const Spacer(flex: 4),
                   ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary2,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary2,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      onPressed: registerAccount,
-                      child: const Row(
-                        children: [
-                          Text(
-                            "Create an Account",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                          ),
-                        ],
-                      )),
+                    ),
+                    onPressed: registerAccount,
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Create an Account",
+                          style: TextStyle(color: AppColors.white),
+                        ),
+                        SizedBox(width: 10),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
                   const Spacer(flex: 6),
                 ],
               ),
@@ -197,29 +241,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!formKey.currentState!.validate()) return;
     DialogUtils.showLoading(context);
     try {
-      DialogUtils.hideLoading(context);
-      final String username = userNameController.text;
+      // Save password to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('username', username);
-      Provider.of<UserData>(context, listen: false).setUsername(username);
+      await prefs.setString('password', passwordController.text);
+
+      // Generate OTP
       final String otp = generateOTP();
       await emailService.sendOtpEmail(
         recipientEmail: emailController.text,
         otp: otp,
       );
-      Navigator.pushReplacementNamed(
+      DialogUtils.hideLoading(context);
+      DialogUtils.showSuccess(
+          context, 'OTP sent to ${emailController.text}. Please verify.');
+
+      Navigator.pushNamed(
         context,
         OTPVerification.routeName,
         arguments: {
           'email': emailController.text,
           'generatedOtp': otp,
           'password': passwordController.text,
+          'username': userNameController.text,
         },
       );
     } catch (e) {
       DialogUtils.hideLoading(context);
       DialogUtils.showError(
-          context, 'Something went wrong. Please try again later.');
+          context, 'Failed to send OTP. Please try again. Error: $e');
     }
   }
 

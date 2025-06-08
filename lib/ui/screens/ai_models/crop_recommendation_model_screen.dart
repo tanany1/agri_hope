@@ -1,11 +1,16 @@
 import 'package:agri_hope/ui/utils/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:io';
+import 'package:weather/weather.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CropRecommendationModelScreen extends StatefulWidget {
   static const String routeName = "crop Recommendation Model";
@@ -22,31 +27,126 @@ class _CropRecommendationModelScreenState
   final TextEditingController nController = TextEditingController();
   final TextEditingController pController = TextEditingController();
   final TextEditingController kController = TextEditingController();
-  final TextEditingController tempController = TextEditingController();
   final TextEditingController humidityController = TextEditingController();
+  final TextEditingController tempController = TextEditingController();
   final TextEditingController landNameController = TextEditingController();
   final TextEditingController tagController = TextEditingController();
 
-  final List<double> predefinedData = [48.73, 38.42, 27.81, 23.57, 62.00121];
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isFormValid = false;
+  final String apiKey = 'cb17b0b03b1d59110c09ffa366d71224';
+  WeatherFactory? weatherFactory;
+
   final _firestore = FirebaseFirestore.instance;
+
+  String? _validateInput(String? value, String label) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a value';
+    }
+    final RegExp regex = RegExp(r'^\d{0,5}(\.\d{0,2})?$');
+    if (!regex.hasMatch(value)) {
+      return 'Enter a valid positive number (max 5 digits)';
+    }
+    final double? number = double.tryParse(value);
+    if (number == null || number < 0 || number > 999) {
+      return 'Value must be between 0 and 999';
+    }
+    return null;
+  }
+
+  void _updateFormValidity() {
+    setState(() {
+      _isFormValid = _formKey.currentState?.validate() ?? false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    weatherFactory = WeatherFactory(apiKey);
     Future.delayed(Duration.zero, () {
       final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
       if (args != null && args.containsKey('prefilledData')) {
         final data = args['prefilledData'] as Map<String, dynamic>;
-        nController.text = data['N'].toString();
-        pController.text = data['P'].toString();
-        kController.text = data['K'].toString();
-        tempController.text = data['temperature'].toString();
-        humidityController.text = data['humidity'].toString();
+        nController.text = data['N'].toStringAsFixed(2);
+        pController.text = data['P'].toStringAsFixed(2);
+        kController.text = data['K'].toStringAsFixed(2);
+        humidityController.text = data['humidity'].toStringAsFixed(2);
+        tempController.text = data['temperature'].toStringAsFixed(2);
+        _updateFormValidity();
       } else {
+        fetchWeatherData();
         showModeSelectionDialog();
       }
     });
+
+    nController.addListener(_updateFormValidity);
+    pController.addListener(_updateFormValidity);
+    kController.addListener(_updateFormValidity);
+    humidityController.addListener(_updateFormValidity);
+    tempController.addListener(_updateFormValidity);
+  }
+
+  @override
+  void dispose() {
+    nController.removeListener(_updateFormValidity);
+    pController.removeListener(_updateFormValidity);
+    kController.removeListener(_updateFormValidity);
+    humidityController.removeListener(_updateFormValidity);
+    tempController.removeListener(_updateFormValidity);
+    nController.dispose();
+    pController.dispose();
+    kController.dispose();
+    humidityController.dispose();
+    tempController.dispose();
+    super.dispose();
+  }
+
+  Future<void> fetchWeatherData() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          showResultDialog("Location services are disabled.");
+        }
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            showResultDialog("Location permission denied.");
+          }
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          showResultDialog("Location permission is permanently denied.");
+        }
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      Weather weather = await weatherFactory!.currentWeatherByLocation(
+          position.latitude, position.longitude);
+      if (mounted) {
+        setState(() {
+          tempController.text = weather.temperature?.celsius?.toStringAsFixed(2) ?? '0.00';
+          humidityController.text = weather.humidity?.toStringAsFixed(2) ?? '0.00';
+          _updateFormValidity();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showResultDialog("Failed to fetch weather data.");
+      }
+    }
   }
 
   void showModeSelectionDialog() {
@@ -90,40 +190,72 @@ class _CropRecommendationModelScreenState
     );
   }
 
-  void startAutomaticMode() {
+  void startAutomaticMode() async {
     if (!mounted) return;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
-          title: const Text("Connecting..."),
-          content: const Text("Connecting to hardware..."),
+        return const AlertDialog(
+          title: Text("Connecting..."),
+          content: Text("Connecting to ESP32..."),
         );
       },
     );
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      if (Navigator.of(context).canPop()) {
+    try {
+      const String esp32Ip = "192.168.1.100";
+      const int esp32Port = 12345;
+      final socket = await Socket.connect(esp32Ip, esp32Port, timeout: const Duration(seconds: 5)).timeout(
+        const Duration(seconds: 20),
+        onTimeout: () {
+          throw TimeoutException("Connection to ESP32 timed out after 20 seconds.");
+        },
+      );
+
+      final dataFuture = socket.first.timeout(
+        const Duration(seconds: 20),
+        onTimeout: () {
+          socket.close();
+          throw TimeoutException("No data received from ESP32 within 20 seconds.");
+        },
+      );
+
+      final List<int> data = await dataFuture;
+      final String response = String.fromCharCodes(data).trim();
+      final Map<String, dynamic> values = jsonDecode(response);
+
+      if (mounted) {
+        setState(() {
+          nController.text = (values['nitrogen'] ?? -1.0) >= 0 ? values['nitrogen'].toStringAsFixed(2) : '0.00';
+          pController.text = (values['phosphorus'] ?? -1.0) >= 0 ? values['phosphorus'].toStringAsFixed(2) : '0.00';
+          kController.text = (values['potassium'] ?? -1.0) >= 0 ? values['potassium'].toStringAsFixed(2) : '0.00';
+          _updateFormValidity();
+        });
+      }
+
+      await socket.close();
+
+      if (mounted && Navigator.of(context).canPop()) {
         Navigator.pop(context);
       }
-      fillAutomaticData();
-    });
-  }
-
-  void fillAutomaticData() {
-    if (!mounted) return;
-    setState(() {
-      nController.text = predefinedData[0].toString();
-      pController.text = predefinedData[1].toString();
-      kController.text = predefinedData[2].toString();
-      tempController.text = predefinedData[3].toString();
-      humidityController.text = predefinedData[4].toString();
-    });
+    } catch (e) {
+      if (mounted) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.pop(context);
+        }
+        showResultDialog("Error: ${e.toString()}");
+      }
+    }
   }
 
   Future<void> predictCrop() async {
+    if (!_formKey.currentState!.validate()) {
+      showResultDialog("Please correct all invalid inputs.");
+      return;
+    }
+
     final Uri apiUrl = Uri.parse("http://127.0.0.1:5000/croprecommendation");
 
     try {
@@ -134,8 +266,8 @@ class _CropRecommendationModelScreenState
           "N": double.tryParse(nController.text) ?? 0.0,
           "P": double.tryParse(pController.text) ?? 0.0,
           "K": double.tryParse(kController.text) ?? 0.0,
-          "temperature": double.tryParse(tempController.text) ?? 0.0,
           "humidity": double.tryParse(humidityController.text) ?? 0.0,
+          "temperature": double.tryParse(tempController.text) ?? 0.0,
         }),
       );
 
@@ -157,7 +289,7 @@ class _CropRecommendationModelScreenState
   }
 
   Future<void> saveMeasurementToDatabase() async {
-    final existingLandNames = <String>{}; // Set to avoid duplicates
+    final existingLandNames = <String>{};
     try {
       final querySnapshot = await _firestore.collection('measurements').get();
       for (var doc in querySnapshot.docs) {
@@ -167,7 +299,7 @@ class _CropRecommendationModelScreenState
       // Handle error silently
     }
 
-    bool useExisting = true; // Toggle between existing and new name
+    bool useExisting = true;
 
     await showDialog(
       context: context,
@@ -274,6 +406,14 @@ class _CropRecommendationModelScreenState
         return;
       }
 
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please log in to save measurements")),
+        );
+        return;
+      }
+
       final tag = tagController.text.isNotEmpty
           ? tagController.text
           : "Tag-${const Uuid().v4().substring(0, 6)}";
@@ -288,6 +428,7 @@ class _CropRecommendationModelScreenState
           'k': double.tryParse(kController.text) ?? 0.0,
           'humidity': double.tryParse(humidityController.text) ?? 0.0,
           'temperature': double.tryParse(tempController.text) ?? 0.0,
+          'user_id': user.uid, // Add user_id to link to the authenticated user
         };
 
         await _firestore.collection('measurements').add(data);
@@ -382,18 +523,21 @@ class _CropRecommendationModelScreenState
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: GridView.count(
-                crossAxisCount: 3,
-                childAspectRatio: 5,
-                crossAxisSpacing: 25,
-                mainAxisSpacing: 15,
-                children: [
-                  buildTextField(nController, "N"),
-                  buildTextField(pController, "P"),
-                  buildTextField(kController, "K"),
-                  buildTextField(humidityController, "Humidity"),
-                  buildTextField(tempController, "Temp"),
-                ],
+              child: Form(
+                key: _formKey,
+                child: GridView.count(
+                  crossAxisCount: 3,
+                  childAspectRatio: 5,
+                  crossAxisSpacing: 25,
+                  mainAxisSpacing: 15,
+                  children: [
+                    buildTextField(nController, "N", "mg/kg"),
+                    buildTextField(pController, "P", "mg/kg"),
+                    buildTextField(kController, "K", "mg/kg"),
+                    buildTextField(humidityController, "Humidity", "%"),
+                    buildTextField(tempController, "Temp", "°C"),
+                  ],
+                ),
               ),
             ),
           ),
@@ -403,9 +547,10 @@ class _CropRecommendationModelScreenState
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: predictCrop,
+                  onPressed: _isFormValid ? predictCrop : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary2,
+                    disabledBackgroundColor: Colors.grey,
                     padding:
                     const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -437,14 +582,14 @@ class _CropRecommendationModelScreenState
     );
   }
 
-  Widget buildTextField(TextEditingController controller, String label) {
+  Widget buildTextField(TextEditingController controller, String label, String unit) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 5),
-        TextField(
+        TextFormField(
           controller: controller,
           decoration: InputDecoration(
             filled: true,
@@ -453,8 +598,19 @@ class _CropRecommendationModelScreenState
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
+            errorStyle: const TextStyle(color: Colors.red),
+            suffixText: unit,
+            suffixStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          keyboardType: TextInputType.number,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          validator: (value) => _validateInput(value, label),
+          onChanged: (value) {
+            _updateFormValidity();
+          },
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(5),
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+          ],
         ),
       ],
     );

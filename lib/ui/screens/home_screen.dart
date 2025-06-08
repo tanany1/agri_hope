@@ -1,3 +1,4 @@
+import 'package:agri_hope/ui/widgets/latest_detected_disease.dart';
 import 'package:agri_hope/ui/widgets/latest_predicted_soil.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -142,6 +143,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                         return const LatestRecommendedCrop();
                                       } else if (lastUsedModel == "Soil Type Analysis") {
                                         return const LatestPredictedSoil();
+                                      } else if (lastUsedModel == "Plant Disease Detection") {
+                                        return const LatestDetectedDisease();
                                       } else {
                                         return Container(
                                           decoration: BoxDecoration(
