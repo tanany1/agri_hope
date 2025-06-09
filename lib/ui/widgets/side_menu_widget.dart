@@ -177,14 +177,15 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
                     Text(
                       "History Log",
                       style: TextStyle(
+                          fontSize: 18,
                           color: AppColors.primary4,
                           fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
                     Image.asset(
                       "assets/img/history.png",
-                      width: 50,
-                      height: 50,
+                      width: 40,
+                      height: 40,
                     ),
                   ],
                 ),
@@ -205,14 +206,15 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
                     Text(
                       "Dashboard",
                       style: TextStyle(
+                        fontSize: 18,
                           color: AppColors.primary4,
-                          fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.bold,),
                     ),
                     const Spacer(),
                     Image.asset(
                       "assets/img/dashboard_icon.png",
-                      width: 50,
-                      height: 50,
+                      width: 40,
+                      height: 40,
                     ),
                   ],
                 ),
@@ -232,13 +234,14 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
                   children: [
                     Text("Profile",
                         style: TextStyle(
+                            fontSize: 18,
                             color: AppColors.primary4,
                             fontWeight: FontWeight.bold)),
                     const Spacer(),
                     Image.asset(
                       "assets/img/profile.png",
-                      width: 50,
-                      height: 50,
+                      width: 40,
+                      height: 40,
                     ),
                   ],
                 ),

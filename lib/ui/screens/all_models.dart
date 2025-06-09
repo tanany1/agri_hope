@@ -24,7 +24,7 @@ class AllModels extends StatelessWidget {
         "routeName": CropRecommendationModelScreen.routeName,
       },
       {
-        "imagePath": "assets/img/soil type.png",
+        "imagePath": "assets/img/soil_type.png",
         "modelName": "Soil Type Analysis",
         "routeName": SoilTypeModelScreen.routeName,
       },
@@ -33,11 +33,6 @@ class AllModels extends StatelessWidget {
         "modelName": "Plant Disease Detection",
         "routeName": PlantDiseasesDetectionModelScreen.routeName,
       },
-      // {
-      //   "imagePath": "assets/img/soil_fertile.png",
-      //   "modelName": "Soil Fertile (Coming Soon)",
-      //   // "routeName": WeatherPredictionScreen.routeName,
-      // },
     ];
 
     return Scaffold(

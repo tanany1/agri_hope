@@ -218,13 +218,13 @@ class _OTPVerificationState extends State<OTPVerification> {
         title: Text(
           'Success',
           style: TextStyle(
-            color: AppColors.white,
+            color: AppColors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           'Account registered successfully!',
-          style: TextStyle(color: AppColors.white),
+          style: TextStyle(color: AppColors.black),
         ),
         actions: [
           TextButton(
@@ -250,13 +250,13 @@ class _OTPVerificationState extends State<OTPVerification> {
         title: Text(
           'Invalid OTP',
           style: TextStyle(
-            color: AppColors.white,
+            color: AppColors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           'The OTP you entered is incorrect.',
-          style: TextStyle(color: AppColors.white),
+          style: TextStyle(color: AppColors.black),
         ),
         actions: [
           TextButton(

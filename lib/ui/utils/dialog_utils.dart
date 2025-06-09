@@ -13,7 +13,7 @@ abstract class DialogUtils {
             children: [
               Text(
                 "Loading...",
-                style: TextStyle(color: AppColors.white),
+                style: TextStyle(color: AppColors.black),
               ),
               const Spacer(),
               CircularProgressIndicator(
@@ -39,13 +39,13 @@ abstract class DialogUtils {
           title: Text(
             "Error",
             style: TextStyle(
-              color: AppColors.white,
+              color: AppColors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
           content: Text(
             message,
-            style: TextStyle(color: AppColors.white),
+            style: TextStyle(color: AppColors.black),
           ),
           actions: [
             TextButton(
@@ -72,13 +72,13 @@ abstract class DialogUtils {
           title: Text(
             "Success",
             style: TextStyle(
-              color: AppColors.white,
+              color: AppColors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
           content: Text(
             message,
-            style: TextStyle(color: AppColors.white),
+            style: TextStyle(color: AppColors.black),
           ),
           actions: [
             TextButton(
